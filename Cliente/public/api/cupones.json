@@ -1,0 +1,59 @@
+{
+  "cupones": [
+    {
+      "id": 1,
+      "marca": "TechNova",
+      "descripcion": "50% de descuento en accesorios inteligentes seleccionados.",
+      "codigo": "TECHNOVA50",
+      "categoria": "Tecnología",
+      "expira": "2026-02-15",
+      "descuento": "50%",
+      "enlace": "https://tienda.technova.com/ofertas",
+      "logo": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=200&q=60"
+    },
+    {
+      "id": 2,
+      "marca": "EcoMarket",
+      "descripcion": "Envío gratis y 15% off en productos sustentables.",
+      "codigo": "ECOENVIO",
+      "categoria": "Hogar",
+      "expira": "2026-01-25",
+      "descuento": "15%",
+      "enlace": "https://ecomarket.com/promos",
+      "logo": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=200&q=60"
+    },
+    {
+      "id": 3,
+      "marca": "UrbanWear",
+      "descripcion": "2x1 en sudaderas premium durante el fin de semana.",
+      "codigo": "URBANX2",
+      "categoria": "Moda",
+      "expira": "2026-01-20",
+      "descuento": "2x1",
+      "enlace": "https://urbanwear.com/colecciones",
+      "logo": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=60"
+    },
+    {
+      "id": 4,
+      "marca": "FreshBites",
+      "descripcion": "30% menos en combos saludables listos para llevar.",
+      "codigo": "FRESH30",
+      "categoria": "Gastronomía",
+      "expira": "2026-03-05",
+      "descuento": "30%",
+      "enlace": "https://freshbites.com/ahorros",
+      "logo": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=60"
+    },
+    {
+      "id": 5,
+      "marca": "FitPulse",
+      "descripcion": "Hasta 40% en membresías anuales premium.",
+      "codigo": "FITPULSE40",
+      "categoria": "Fitness",
+      "expira": "2026-04-01",
+      "descuento": "40%",
+      "enlace": "https://fitpulse.com/registros",
+      "logo": "https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=200&q=60"
+    }
+  ]
+}

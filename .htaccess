@@ -1,0 +1,19 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Redirigir petición raíz /cupones/ al backend
+  RewriteRule ^$ /cupones/servidor/ [R=302,L]
+
+  # No tocar nada que ya apunte al backend
+  RewriteRule ^servidor/ - [L]
+
+  # Evitar bucles con index.php
+  RewriteRule ^index\.php$ - [L]
+
+  # Solo reescribir cuando no exista archivo o carpeta real
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . index.php [L]
+</IfModule>

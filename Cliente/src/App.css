@@ -1,0 +1,272 @@
+.header {
+  background-color: var(--color-panel);
+}
+
+.barra-de-busqueda {
+  background-color: var(--color-fondo-secundario);
+}
+
+.layout-principal {
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.062), transparent 55%);
+}
+
+.text-accent {
+  color: var(--color-acento);
+}
+
+.btn-accent {
+  background-color: var(--color-acento);
+  color: #fff;
+  border: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-accent:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(249, 115, 22, 0.25);
+}
+
+.btn-outline-accent {
+  border-color: var(--color-acento);
+  color: var(--color-acento);
+}
+
+.btn-outline-accent:hover {
+  background-color: var(--color-acento);
+  color: #fff;
+}
+
+.bg-panel {
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-borde);
+}
+
+.vitrina-cupones {
+  background: linear-gradient(135deg, var(--color-panel), var(--color-panel-secundario)) padding-box, linear-gradient(135deg, rgba(249, 115, 22, 0.35), transparent) border-box;
+  border: 1px solid transparent;
+  color: var(--color-texto);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+}
+
+.vitrina-cupones__resumen .vitrina-metrica {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-borde);
+  border-radius: 0.4rem;
+  padding: 0.75rem 1.25rem;
+  min-width: 140px;
+  color: var(--color-texto);
+}
+
+.vitrina-cupones__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.tarjeta-vitrina {
+  background-color: var(--color-panel);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-vitrina:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+}
+
+.tarjeta-vitrina__chip {
+  background-color: rgba(249, 115, 22, 0.12);
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.tarjeta-vitrina__chip.valoracion {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--color-borde);
+}
+
+.tarjeta-vitrina__logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 1px solid var(--color-borde);
+  background-color: var(--color-panel-secundario);
+}
+
+.tarjeta-vitrina__logo--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--color-acento);
+}
+
+.tarjeta-vitrina__descripcion {
+  color: var(--color-texto);
+  opacity: 0.85;
+}
+
+.tarjeta-vitrina__estado {
+  font-size: 0.95rem;
+}
+
+:root[data-tema="oscuro"] .tarjeta-vitrina {
+  border-color: var(--color-borde);
+}
+
+.barra-lateral {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.tarjeta-cupon {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-cupon:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.15);
+}
+
+.tarjeta-cupon .marca-placeholder {
+  width: 56px;
+  height: 56px;
+  background: var(--color-panel-secundario);
+  border: 1px solid var(--color-borde);
+}
+
+.codigo-cupon {
+  font-family: "Space Mono", "Fira Code", monospace;
+  letter-spacing: 0.25rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 999px;
+  border: 1px dashed var(--color-borde);
+  min-width: 200px;
+  text-align: center;
+}
+
+.codigo-oculto {
+  filter: blur(5px);
+  color: var(--color-texto);
+  opacity: 0.65;
+}
+
+.codigo-visible {
+  filter: none;
+  color: var(--color-texto);
+  text-shadow: none;
+}
+
+.estadisticas-cupones {
+  background: var(--color-panel);
+  border: 1px solid var(--color-borde);
+}
+
+.categoria-card {
+  background: var(--color-panel);
+  border: 1px solid var(--color-borde);
+}
+
+.w-fit {
+  width: fit-content;
+}
+
+.modal-content.bg-panel {
+  background-color: var(--modal-bg);
+  color: var(--color-texto);
+  backdrop-filter: blur(18px);
+  border: 1px solid var(--color-borde);
+}
+
+.modal-close-circle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--color-borde);
+  background-color: var(--modal-bg);
+  color: var(--color-texto);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.12);
+}
+
+.modal-close-circle:hover {
+  background-color: var(--color-panel-secundario);
+}
+
+.reel-cupon {
+  background: linear-gradient(135deg, var(--color-panel), var(--color-panel-secundario));
+  border: 1px solid var(--color-borde);
+}
+
+.reel-cupon__media {
+  width: 100%;
+  padding-top: 130%;
+  background: radial-gradient(circle at 30% 30%, rgba(249, 115, 22, 0.4), transparent);
+  border: 1px dashed var(--color-borde);
+}
+
+.reel-cupon__play {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.carrusel-cupones {
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-borde);
+}
+
+.carrusel-cupones__viewport {
+  overflow: hidden;
+}
+
+.carrusel-cupones__track {
+  display: flex;
+  transition: transform 0.6s ease;
+}
+
+.carrusel-cupones__slide {
+  min-width: 100%;
+}
+
+.carrusel-cupones__indicador {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--color-borde);
+  background-color: transparent;
+}
+
+.carrusel-cupones__indicador.activo {
+  background-color: var(--color-acento);
+  border-color: var(--color-acento);
+}
+
+.modal-backdrop.show {
+  background-color: var(--color-texto);
+  opacity: 0.35;
+}
+
+.card-cupon-estilo {
+  background-color: #1a1d23; /* Fondo oscuro */
+  border: 1px solid #2d323b;
+  border-radius: 20px;
+  transition: transform 0.2s;
+}
+
+.extra-small {
+  font-size: 0.75rem;
+}

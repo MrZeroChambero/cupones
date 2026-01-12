@@ -10,7 +10,7 @@ const asegurarPath = (ruta) => {
 };
 
 const apiHost = limpiarHost(import.meta.env.VITE_API_HOST || "http://localhost");
-const apiPort = import.meta.env.VITE_API_PORT || "8012";
+const apiPort = import.meta.env.VITE_API_PORT || "80";
 const apiPath = asegurarPath(import.meta.env.VITE_API_PATH || "/cupones/servidor");
 const hostYaTienePuerto = /:\d+$/.test(apiHost.replace(/^https?:\/\//i, ""));
 const puertoFinal = apiPort && !hostYaTienePuerto ? `:${apiPort}` : "";

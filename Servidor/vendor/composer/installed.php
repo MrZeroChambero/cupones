@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'mk-zero/servidor',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '9391962d10d503ccedeca7891fbdb4d2fccd637e',
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => 'bbc0db2d548c0aecfdb3a732fdd0be52271eaf1a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'mk-zero/servidor' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '9391962d10d503ccedeca7891fbdb4d2fccd637e',
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => 'bbc0db2d548c0aecfdb3a732fdd0be52271eaf1a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

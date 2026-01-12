@@ -4,67 +4,27 @@ import SelectorTema from "./SelectorTema";
 
 const Encabezado = ({ tema, onCambiarTema, onAbrirModalNuevoCupon }) => {
   return (
-    <header className="bg-body-tertiary border-bottom border-light-subtle sticky-top">
-      {/* Barra de navegación principal con enlaces a las rutas definidas en React Router */}
-      <nav className="navbar navbar-expand-lg navbar-light container py-3">
-        <NavLink to="/" className="navbar-brand fw-bold text-accent">
-          BombCoupons CLON
-        </NavLink>
+    <header className="header border-bottom sticky-top py-2">
+      <div className="container">
+        <nav className="navbar p-0 d-flex align-items-center">
+          {/* 1. LOGO */}
+          <NavLink to="/" className="navbar-brand d-flex align-items-center me-auto me-lg-4">
+            <span className="fw-bold text-body">
+              <span className="text-warning">🔥</span> BOMBCOUPONS
+            </span>
+          </NavLink>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#menuPrincipal"
-          aria-controls="menuPrincipal"
-          aria-expanded="false"
-          aria-label="Alternar navegación"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+          {/* 2. BUSCADOR (Se adapta a dark/light) */}
+          <div className="flex-grow-1 d-flex justify-content-center px-2 px-md-5">
+            <input type="text" className="form-control barra-de-busqueda " placeholder="Search coupons & brands" style={{ color: "inherit" }} />
+          </div>
 
-        <div className="collapse navbar-collapse" id="menuPrincipal">
-          <ul className="navbar-nav me-auto gap-2">
-            <li className="nav-item">
-              <NavLink
-                to="/"
-                className="nav-link d-flex align-items-center gap-2"
-              >
-                <FiHome aria-hidden="true" />
-                Inicio
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/cupones"
-                className="nav-link d-flex align-items-center gap-2"
-              >
-                <FiTag aria-hidden="true" />
-                Cupones
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/categorias"
-                className="nav-link d-flex align-items-center gap-2"
-              >
-                <FiGrid aria-hidden="true" />
-                Categorías
-              </NavLink>
-            </li>
-            <li className="nav-item d-flex align-items-center">
-              <button
-                type="button"
-                className="btn btn-outline-accent btn-sm fw-semibold ms-lg-2"
-                onClick={onAbrirModalNuevoCupon}
-              >
-                Nuevo registro
-              </button>
-            </li>
-          </ul>
-          <SelectorTema tema={tema} onCambiarTema={onCambiarTema} />
-        </div>
-      </nav>
+          {/* 3. SELECTOR DE TEMA (Extremo derecho) */}
+          <div className="ms-auto ms-lg-4">
+            <SelectorTema tema={tema} onCambiarTema={onCambiarTema} />
+          </div>
+        </nav>
+      </div>
     </header>
   );
 };

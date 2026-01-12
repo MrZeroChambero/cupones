@@ -1,9 +1,13 @@
+.header {
+  background-color: var(--color-panel);
+}
+
+.barra-de-busqueda {
+  background-color: var(--color-fondo-secundario);
+}
+
 .layout-principal {
-  background: radial-gradient(
-    circle at top,
-    rgba(249, 115, 22, 0.08),
-    transparent 55%
-  );
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.062), transparent 55%);
 }
 
 .text-accent {
@@ -38,13 +42,7 @@
 }
 
 .vitrina-cupones {
-  background: linear-gradient(
-        135deg,
-        var(--color-panel),
-        var(--color-panel-secundario)
-      )
-      padding-box,
-    linear-gradient(135deg, rgba(249, 115, 22, 0.35), transparent) border-box;
+  background: linear-gradient(135deg, var(--color-panel), var(--color-panel-secundario)) padding-box, linear-gradient(135deg, rgba(249, 115, 22, 0.35), transparent) border-box;
   border: 1px solid transparent;
   color: var(--color-texto);
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
@@ -53,7 +51,7 @@
 .vitrina-cupones__resumen .vitrina-metrica {
   background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--color-borde);
-  border-radius: 1rem;
+  border-radius: 0.4rem;
   padding: 0.75rem 1.25rem;
   min-width: 140px;
   color: var(--color-texto);
@@ -205,22 +203,14 @@
 }
 
 .reel-cupon {
-  background: linear-gradient(
-    135deg,
-    var(--color-panel),
-    var(--color-panel-secundario)
-  );
+  background: linear-gradient(135deg, var(--color-panel), var(--color-panel-secundario));
   border: 1px solid var(--color-borde);
 }
 
 .reel-cupon__media {
   width: 100%;
   padding-top: 130%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    rgba(249, 115, 22, 0.4),
-    transparent
-  );
+  background: radial-gradient(circle at 30% 30%, rgba(249, 115, 22, 0.4), transparent);
   border: 1px dashed var(--color-borde);
 }
 
@@ -268,4 +258,15 @@
 .modal-backdrop.show {
   background-color: var(--color-texto);
   opacity: 0.35;
+}
+
+.card-cupon-estilo {
+  background-color: #1a1d23; /* Fondo oscuro */
+  border: 1px solid #2d323b;
+  border-radius: 20px;
+  transition: transform 0.2s;
+}
+
+.extra-small {
+  font-size: 0.75rem;
 }

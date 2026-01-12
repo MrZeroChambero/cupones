@@ -6,15 +6,8 @@ const SelectorTema = ({ tema, onCambiarTema }) => {
   const Icono = esClaro ? FiMoon : FiSun;
 
   return (
-    <button
-      type="button"
-      className="btn btn-outline-accent rounded-pill fw-semibold"
-      onClick={onCambiarTema}
-    >
-      <span className="d-inline-flex align-items-center gap-2">
-        <Icono aria-hidden="true" />
-        {etiqueta}
-      </span>
+    <button type="button" className="btn btn-link text-decoration-none p-2 border-0" onClick={onCambiarTema} style={{ color: "inherit" }}>
+      <Icono aria-hidden="true" style={{ fontSize: "1.4rem" }} />
     </button>
   );
 };

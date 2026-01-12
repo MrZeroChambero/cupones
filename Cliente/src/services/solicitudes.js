@@ -9,36 +9,23 @@ const asegurarPath = (ruta) => {
   return ruta.startsWith("/") ? ruta : `/${ruta}`;
 };
 
-const apiHost = limpiarHost(
-  import.meta.env.VITE_API_HOST || "http://localhost"
-);
-const apiPort = import.meta.env.VITE_API_PORT || "8080";
-const apiPath = asegurarPath(
-  import.meta.env.VITE_API_PATH || "/cupones/servidor"
-);
+const apiHost = limpiarHost(import.meta.env.VITE_API_HOST || "http://localhost");
+const apiPort = import.meta.env.VITE_API_PORT || "80";
+const apiPath = asegurarPath(import.meta.env.VITE_API_PATH || "/cupones/servidor");
 const hostYaTienePuerto = /:\d+$/.test(apiHost.replace(/^https?:\/\//i, ""));
 const puertoFinal = apiPort && !hostYaTienePuerto ? `:${apiPort}` : "";
 const baseInferida = `${apiHost}${puertoFinal}${apiPath}`;
 
 // Si no se define VITE_API_BASE_URL se construye usando host + puerto + path
-const baseBackend = (import.meta.env.VITE_API_BASE_URL || baseInferida).replace(
-  /\/+$/,
-  ""
-);
+const baseBackend = (import.meta.env.VITE_API_BASE_URL || baseInferida).replace(/\/+$/, "");
 
 // La base final dependerá de si usamos mocks o la API real
 const BASE_API_URL = usaMocksLocales ? "/api" : baseBackend;
 
 export const ENDPOINTS = {
-  cupones: usaMocksLocales
-    ? `${BASE_API_URL}/cupones.json`
-    : `${BASE_API_URL}/cupones`,
-  destacados: usaMocksLocales
-    ? `${BASE_API_URL}/destacados.json`
-    : `${BASE_API_URL}/destacados`,
-  categorias: usaMocksLocales
-    ? `${BASE_API_URL}/categorias.json`
-    : `${BASE_API_URL}/categorias`,
+  cupones: usaMocksLocales ? `${BASE_API_URL}/cupones.json` : `${BASE_API_URL}/cupones`,
+  destacados: usaMocksLocales ? `${BASE_API_URL}/destacados.json` : `${BASE_API_URL}/destacados`,
+  categorias: usaMocksLocales ? `${BASE_API_URL}/categorias.json` : `${BASE_API_URL}/categorias`,
 };
 
 const obtenerEtiquetaOrigen = () => (usaMocksLocales ? "MOCK" : "BACKEND");
@@ -56,13 +43,11 @@ const registrarRespuestaBackend = (endpoint, data) => {
 const manejarRespuestas = (tipoRespuesta, payload) => {
   switch (tipoRespuesta) {
     case "cupones": {
-      const formatearCupones = () =>
-        Array.isArray(payload?.cupones) ? payload.cupones : [];
+      const formatearCupones = () => (Array.isArray(payload?.cupones) ? payload.cupones : []);
       return formatearCupones();
     }
     case "destacados": {
-      const organizarDestacados = () =>
-        Array.isArray(payload?.destacados) ? payload.destacados : [];
+      const organizarDestacados = () => (Array.isArray(payload?.destacados) ? payload.destacados : []);
       return organizarDestacados();
     }
     case "mensaje": {
@@ -79,8 +64,7 @@ const manejarRespuestas = (tipoRespuesta, payload) => {
 const manejarError = (error) => {
   // Generamos un Error con el contrato que espera la UI para mostrar alertas
   const construirError = () => {
-    const mensaje =
-      error?.response?.data?.mensaje || error.message || "Error desconocido";
+    const mensaje = error?.response?.data?.mensaje || error.message || "Error desconocido";
     const err = new Error(mensaje);
     if (error?.response?.data?.errores) {
       err.detalle = error.response.data.errores;
@@ -126,9 +110,7 @@ export const obtenerCategorias = async () => {
     registrarSolicitudBackend("GET /categorias", ENDPOINTS.categorias);
     const respuesta = await axios.get(ENDPOINTS.categorias);
     registrarRespuestaBackend("GET /categorias", respuesta.data);
-    return Array.isArray(respuesta?.data?.categorias)
-      ? respuesta.data.categorias
-      : [];
+    return Array.isArray(respuesta?.data?.categorias) ? respuesta.data.categorias : [];
   } catch (error) {
     console.error(`[${obtenerEtiquetaOrigen()}] Error GET /categorias`, error);
     manejarError(error);
@@ -141,18 +123,13 @@ export const crearCupon = async (payload) => {
   }
   try {
     registrarSolicitudBackend("POST /cupones", ENDPOINTS.cupones);
-    const esFormData =
-      typeof FormData !== "undefined" && payload instanceof FormData;
+    const esFormData = typeof FormData !== "undefined" && payload instanceof FormData;
     const configuracion = esFormData
       ? {}
       : {
           headers: { "Content-Type": "application/json" },
         };
-    const respuesta = await axios.post(
-      ENDPOINTS.cupones,
-      payload,
-      configuracion
-    );
+    const respuesta = await axios.post(ENDPOINTS.cupones, payload, configuracion);
     registrarRespuestaBackend("POST /cupones", respuesta.data);
     return respuesta?.data?.cupon ?? null;
   } catch (error) {

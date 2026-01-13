@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-use MkZero\Servidor\Core\Conexion\Conexion;
-use MkZero\Servidor\Http\Controllers\Api\ApiController;
-use MkZero\Servidor\Repositorios\Categoria\CategoriaRepositorio;
-use MkZero\Servidor\Repositorios\Cupon\CuponRepositorio;
-use MkZero\Servidor\Repositorios\Destacado\DestacadoRepositorio;
+use MkZero\Servidor\Conexion\Conexion;
+use MkZero\Servidor\Respuesta\RespuestaJson;
 
 require __DIR__ . '/vendor/autoload.php';
 
@@ -50,24 +47,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
   exit;
 }
 
-$controlador = new ApiController(
-  new CuponRepositorio($conexion),
-  new DestacadoRepositorio($conexion),
-  new CategoriaRepositorio($conexion)
-);
-
 $router = new AltoRouter();
 $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
 $router->setBasePath($basePath === '' ? '/' : $basePath);
 
-// Definición de rutas principales de la API
-$router->map('GET', '/', [$controlador, 'saludo']);
-foreach (['', '/api'] as $prefijo) {
-  $router->map('GET', $prefijo . '/cupones', [$controlador, 'listarCupones']);
-  $router->map('GET', $prefijo . '/destacados', [$controlador, 'listarDestacados']);
-  $router->map('GET', $prefijo . '/categorias', [$controlador, 'listarCategorias']);
-  $router->map('POST', $prefijo . '/cupones', [$controlador, 'crearCupon']);
-}
+// Definición de rutas principales de la API en un solo archivo
+$registrar = require __DIR__ . '/src/Endpoints.php';
+$registrar($router, $conexion);
 
 $coincidencia = $router->match();
 
@@ -77,9 +63,4 @@ if ($coincidencia && is_callable($coincidencia['target'])) {
 }
 
 $rutaSolicitada = $_SERVER['REQUEST_URI'] ?? '';
-http_response_code(404);
-header('Content-Type: application/json; charset=utf-8');
-echo json_encode(
-  ['mensaje' => "No existe la ruta '{$rutaSolicitada}'"],
-  JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
-);
+RespuestaJson::error("No existe la ruta '{$rutaSolicitada}'", 404);

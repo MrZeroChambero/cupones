@@ -1,0 +1,40 @@
+{
+  "promociones": [
+    {
+      "id": 1,
+      "marca": "ShopiTech",
+      "nombre": "Semana Gamer",
+      "cupones": 6,
+      "estado": "disponible",
+      "rating": 4.9,
+      "detalles": "Hasta 50 % en periféricos RGB y envíos gratis en pedidos mayores a $80.",
+      "img": "https://images.unsplash.com/photo-1517059224940-d4af9eec41e5",
+      "icono": "https://images.unsplash.com/photo-1470246973918-29a93221c455",
+      "fecha_creacion": "2024-05-03"
+    },
+    {
+      "id": 2,
+      "marca": "NovaFashion",
+      "nombre": "Reels de verano",
+      "cupones": 4,
+      "estado": "agotándose",
+      "rating": 4.7,
+      "detalles": "Colecciones cápsula con cashback del 15 % en la primera compra.",
+      "img": "https://images.unsplash.com/photo-1490100667990-4fced8021649",
+      "icono": "https://images.unsplash.com/photo-1507679799987-c73779587ccf",
+      "fecha_creacion": "2024-04-28"
+    },
+    {
+      "id": 3,
+      "marca": "Foodora",
+      "nombre": "Menú express",
+      "cupones": 8,
+      "estado": "nuevo",
+      "rating": 4.6,
+      "detalles": "2x1 en combos seleccionados y delivery prioritario en zonas urbanas.",
+      "img": "https://images.unsplash.com/photo-1493770348161-369560ae357d",
+      "icono": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4",
+      "fecha_creacion": "2024-05-10"
+    }
+  ]
+}

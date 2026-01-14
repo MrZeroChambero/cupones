@@ -8,6 +8,7 @@ export const ENDPOINTS = usarMocks
       cupones: `${BASE_API_URL}/cupones.json`,
       destacados: `${BASE_API_URL}/destacados.json`,
       categorias: `${BASE_API_URL}/categorias.json`,
+      promociones: `${BASE_API_URL}/promociones.json`,
     }
   : { ...API_ENDPOINTS };
 
@@ -164,6 +165,8 @@ const manejarRespuestas = (tipoRespuesta, payload) => {
       return extraerListado(payload, "destacados");
     case "categorias":
       return extraerListado(payload, "categorias");
+    case "promociones":
+      return extraerListado(payload, "promociones");
     case "mensaje":
       return payload?.message ?? payload?.mensaje ?? "Operación completada";
     default:
@@ -185,6 +188,10 @@ export const obtenerCategorias = async () => {
     return [];
   }
   return consumirListado("categorias", "GET /categorias", "categorias");
+};
+
+export const obtenerPromociones = async () => {
+  return consumirListado("promociones", "GET /promociones", "promociones");
 };
 
 export const crearCupon = async (payload) => {
@@ -209,6 +216,34 @@ export const crearCupon = async (payload) => {
 
   if (contenido && typeof contenido === "object") {
     return contenido.cupon ?? null;
+  }
+  return null;
+};
+
+export const crearPromocion = async (payload) => {
+  if (usarMocks) {
+    throw new Error(
+      "No se pueden crear promociones cuando se usan mocks locales"
+    );
+  }
+  const esFormData =
+    typeof FormData !== "undefined" && payload instanceof FormData;
+  const configuracion = esFormData
+    ? {}
+    : {
+        headers: { "Content-Type": "application/json" },
+      };
+
+  const contenido = await ejecutarSolicitud({
+    metodo: "POST",
+    endpointKey: "promociones",
+    descriptor: "POST /promociones",
+    cuerpo: payload,
+    config: configuracion,
+  });
+
+  if (contenido && typeof contenido === "object") {
+    return contenido.promocion ?? null;
   }
   return null;
 };

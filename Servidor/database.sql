@@ -39,6 +39,19 @@ CREATE TABLE IF NOT EXISTS destacados (
     CONSTRAINT fk_destacado_cupon FOREIGN KEY (cupon_id) REFERENCES cupones(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS promociones (
+    id_Promocion INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    marca VARCHAR(120) NOT NULL,
+    nombre VARCHAR(150) NOT NULL,
+    cupones INT UNSIGNED DEFAULT 0,
+    estado VARCHAR(60) DEFAULT 'disponible',
+    rating DECIMAL(3,1) DEFAULT 0.0,
+    detalles VARCHAR(255) NOT NULL,
+    img VARCHAR(255) NOT NULL,
+    icono VARCHAR(255) NOT NULL,
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 INSERT INTO categorias (nombre, descripcion, slug) VALUES
     ('Tecnología', 'Dispositivos inteligentes y periféricos', 'tecnologia'),
     ('Moda', 'Colecciones urbanas y lifestyle', 'moda'),
@@ -74,3 +87,17 @@ INSERT INTO destacados (titulo, copy, codigo, descuento, expira, enlace, cupon_i
             4
         )
 ON DUPLICATE KEY UPDATE copy = VALUES(copy), enlace = VALUES(enlace);
+
+INSERT INTO promociones (marca, nombre, cupones, estado, rating, detalles, img, icono)
+VALUES
+    (
+        'ShopiTech',
+        'Semana Gamer',
+        6,
+        'disponible',
+        4.8,
+        'Hasta 50 % en periféricos RGB y envíos gratis en pedidos mayores a $80.',
+        '/img/sample-reel.png',
+        '/icons/sample-reel.png'
+    )
+ON DUPLICATE KEY UPDATE detalles = VALUES(detalles);

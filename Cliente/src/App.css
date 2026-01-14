@@ -7,7 +7,11 @@
 }
 
 .layout-principal {
-  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.062), transparent 55%);
+  background: radial-gradient(
+    circle at top,
+    rgba(255, 255, 255, 0.062),
+    transparent 55%
+  );
 }
 
 .text-accent {
@@ -42,7 +46,13 @@
 }
 
 .vitrina-cupones {
-  background: linear-gradient(135deg, var(--color-panel), var(--color-panel-secundario)) padding-box, linear-gradient(135deg, rgba(249, 115, 22, 0.35), transparent) border-box;
+  background: linear-gradient(
+        135deg,
+        var(--color-panel),
+        var(--color-panel-secundario)
+      )
+      padding-box,
+    linear-gradient(135deg, rgba(249, 115, 22, 0.35), transparent) border-box;
   border: 1px solid transparent;
   color: var(--color-texto);
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
@@ -53,6 +63,20 @@
   border: 1px solid var(--color-borde);
   border-radius: 0.4rem;
   padding: 0.75rem 1.25rem;
+  .upload-dropzone {
+    border: 1px dashed var(--color-borde);
+    border-radius: 1rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--color-panel);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .upload-dropzone.is-invalid {
+    border-color: #dc3545;
+  }
   min-width: 140px;
   color: var(--color-texto);
 }
@@ -203,14 +227,22 @@
 }
 
 .reel-cupon {
-  background: linear-gradient(135deg, var(--color-panel), var(--color-panel-secundario));
+  background: linear-gradient(
+    135deg,
+    var(--color-panel),
+    var(--color-panel-secundario)
+  );
   border: 1px solid var(--color-borde);
 }
 
 .reel-cupon__media {
   width: 100%;
   padding-top: 130%;
-  background: radial-gradient(circle at 30% 30%, rgba(249, 115, 22, 0.4), transparent);
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(249, 115, 22, 0.4),
+    transparent
+  );
   border: 1px dashed var(--color-borde);
 }
 
@@ -253,6 +285,70 @@
 .carrusel-cupones__indicador.activo {
   background-color: var(--color-acento);
   border-color: var(--color-acento);
+}
+
+.reels-promociones {
+  background: radial-gradient(
+      circle at top,
+      rgba(249, 115, 22, 0.08),
+      transparent 55%
+    ),
+    var(--color-panel);
+  border: 1px solid var(--color-borde);
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.15);
+}
+
+.reels-promociones__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  scroll-snap-type: x mandatory;
+}
+
+.reel-promocion-card {
+  background-color: var(--color-panel);
+  border: 1px solid var(--color-borde);
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  scroll-snap-align: start;
+  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+}
+
+.reel-promocion-card__media {
+  width: 100%;
+  padding-top: 140px;
+  background-color: var(--color-panel-secundario);
+  background-size: cover;
+  background-position: center;
+  filter: saturate(1.1);
+}
+
+.reel-promocion-card__cuerpo {
+  padding: 1.25rem;
+  flex: 1;
+}
+
+.reel-promocion-card__logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  object-fit: cover;
+  border: 1px solid var(--color-borde);
+  background-color: var(--color-panel-secundario);
+}
+
+.reel-promocion-card__logo--placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--color-acento);
 }
 
 .modal-backdrop.show {

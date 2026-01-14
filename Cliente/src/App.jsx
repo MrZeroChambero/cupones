@@ -8,11 +8,14 @@ import PaginaCategorias from "./Componentes/paginas/PaginaCategorias";
 import PaginaNoEncontrada from "./Componentes/paginas/PaginaNoEncontrada";
 import ModalCodigoCupon from "./Componentes/ModalCodigoCupon";
 import ModalNuevoCupon from "./Componentes/ModalNuevoCupon";
+import CrearPromocion from "./Componentes/CrearPromocion/CrearPromocion";
 import {
   obtenerCupones,
   obtenerDestacados,
   obtenerCategorias,
   crearCupon,
+  obtenerPromociones,
+  crearPromocion,
 } from "./services/solicitudes";
 const TEMA_STORAGE_KEY = "bombcoupons-tema";
 
@@ -35,11 +38,15 @@ function App() {
   const [cupones, setCupones] = useState([]);
   const [destacados, setDestacados] = useState([]);
   const [categorias, setCategorias] = useState([]);
+  const [promociones, setPromociones] = useState([]);
   const [estadoCarga, setEstadoCarga] = useState({ cargando: true, error: "" });
   const [cuponesRevelados, setCuponesRevelados] = useState([]);
   const [cuponActivo, setCuponActivo] = useState(null);
   const [modalNuevoCuponAbierto, setModalNuevoCuponAbierto] = useState(false);
   const [creandoCupon, setCreandoCupon] = useState(false);
+  const [modalNuevaPromocionAbierto, setModalNuevaPromocionAbierto] =
+    useState(false);
+  const [creandoPromocion, setCreandoPromocion] = useState(false);
 
   useEffect(() => {
     // Reflejamos el modo en data-tema y en data-bs-theme para sincronizar Bootstrap
@@ -58,15 +65,21 @@ function App() {
     const cargarDatos = async () => {
       try {
         setEstadoCarga({ cargando: true, error: "" });
-        const [listaCupones, listaDestacados, listaCategorias] =
-          await Promise.all([
-            obtenerCupones(),
-            obtenerDestacados(),
-            obtenerCategorias(),
-          ]);
+        const [
+          listaCupones,
+          listaDestacados,
+          listaCategorias,
+          listaPromociones,
+        ] = await Promise.all([
+          obtenerCupones(),
+          obtenerDestacados(),
+          obtenerCategorias(),
+          obtenerPromociones(),
+        ]);
         setCupones(listaCupones);
         setDestacados(listaDestacados);
         setCategorias(listaCategorias);
+        setPromociones(listaPromociones);
       } catch (error) {
         console.error("Fallo al cargar datos desde el backend", error);
         setEstadoCarga({
@@ -124,6 +137,8 @@ function App() {
   const cerrarModalCupon = () => setCuponActivo(null);
   const abrirModalNuevoCupon = () => setModalNuevoCuponAbierto(true);
   const cerrarModalNuevoCupon = () => setModalNuevoCuponAbierto(false);
+  const abrirModalNuevaPromocion = () => setModalNuevaPromocionAbierto(true);
+  const cerrarModalNuevaPromocion = () => setModalNuevaPromocionAbierto(false);
 
   const manejarCrearCupon = async (datosCupon) => {
     setCreandoCupon(true);
@@ -138,6 +153,19 @@ function App() {
       throw error;
     } finally {
       setCreandoCupon(false);
+    }
+  };
+
+  const manejarCrearPromocion = async (datosPromocion) => {
+    setCreandoPromocion(true);
+    try {
+      const promocionCreada = await crearPromocion(datosPromocion);
+      if (promocionCreada) {
+        setPromociones((prev) => [promocionCreada, ...prev]);
+        setModalNuevaPromocionAbierto(false);
+      }
+    } finally {
+      setCreandoPromocion(false);
     }
   };
 
@@ -168,6 +196,8 @@ function App() {
                 error={estadoCarga.error}
                 onRevelarCodigo={manejarCodigoVisible}
                 cuponesRevelados={cuponesRevelados}
+                promociones={promociones}
+                onCrearPromocion={abrirModalNuevaPromocion}
               />
             }
           />
@@ -207,6 +237,12 @@ function App() {
         enProceso={creandoCupon}
         onCerrar={cerrarModalNuevoCupon}
         onGuardar={manejarCrearCupon}
+      />
+      <CrearPromocion
+        visible={modalNuevaPromocionAbierto}
+        enProceso={creandoPromocion}
+        onCerrar={cerrarModalNuevaPromocion}
+        onGuardar={manejarCrearPromocion}
       />
     </>
   );

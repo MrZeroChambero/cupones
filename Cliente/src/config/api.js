@@ -51,11 +51,18 @@ const endpointCategorias = limpiarPath(
     obtenerEnv("VITE_API_ENDPOINT_CATEGORIAS", "/categorias")
   )
 );
+const endpointPromociones = limpiarPath(
+  obtenerEnv(
+    "VITE_ENDPOINT_PROMOCIONES",
+    obtenerEnv("VITE_API_ENDPOINT_PROMOCIONES", "/promociones")
+  )
+);
 
 export const API_ENDPOINTS = {
   cupones: `${API_BASE_URL}${endpointCupones}`,
   destacados: `${API_BASE_URL}${endpointDestacados}`,
   categorias: `${API_BASE_URL}${endpointCategorias}`,
+  promociones: `${API_BASE_URL}${endpointPromociones}`,
 };
 
 export const usarMocks =

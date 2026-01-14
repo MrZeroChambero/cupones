@@ -3,6 +3,7 @@ import EstadisticasCupones from "../EstadisticasCupones";
 import ListadoCupones from "../ListadoCupones";
 import ReelCupon from "../ReelCupon";
 import CarruselCupones from "../CarruselCupones";
+import Promociones from "../Promociones/Promociones";
 
 const PaginaInicio = ({
   destacados,
@@ -11,6 +12,8 @@ const PaginaInicio = ({
   error,
   onRevelarCodigo,
   cuponesRevelados,
+  promociones = [],
+  onCrearPromocion,
 }) => {
   // Limitamos algunas secciones iniciales para resaltar novedades
   const primerosCupones = cupones.slice(0, 3);
@@ -30,6 +33,10 @@ const PaginaInicio = ({
         cupones={cupones}
         cuponesRevelados={cuponesRevelados}
         onRevelarCodigo={onRevelarCodigo}
+      />
+      <Promociones
+        promociones={promociones}
+        onCrearPromocion={onCrearPromocion}
       />
 
       <section>

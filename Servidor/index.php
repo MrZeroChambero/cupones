@@ -7,6 +7,23 @@ use MkZero\Servidor\Respuesta\RespuestaJson;
 
 require __DIR__ . '/vendor/autoload.php';
 
+if (!defined('CLIENTE_PUBLIC_IMG_DIR')) {
+  $dirImagenes = __DIR__ . '/../Cliente/public/img';
+  if (!is_dir($dirImagenes)) {
+    @mkdir($dirImagenes, 0775, true);
+  }
+  define('CLIENTE_PUBLIC_IMG_DIR', realpath($dirImagenes) ?: $dirImagenes);
+}
+
+if (!defined('CLIENTE_PUBLIC_ICON_DIR')) {
+  $dirIconos = __DIR__ . '/../Cliente/public/icons';
+  if (!is_dir($dirIconos)) {
+    @mkdir($dirIconos, 0775, true);
+  }
+  define('CLIENTE_PUBLIC_ICON_DIR', realpath($dirIconos) ?: $dirIconos);
+}
+
+
 error_reporting(E_ALL);
 $errorEmitido = false;
 $emitirErrorJson = static function (string $mensaje, int $status = 500, array $contexto = []) use (&$errorEmitido): void {

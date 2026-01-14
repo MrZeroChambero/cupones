@@ -25,7 +25,9 @@ class Destacado
   public function listar(): void
   {
     try {
-      $sql = 'SELECT d.id, d.titulo, COALESCE(c.marca, d.marca) AS marca, d.copy, d.codigo,
+      $sql = 'SELECT d.id, d.titulo,
+             COALESCE(c.marca, d.titulo) AS marca,
+             d.copy, d.codigo,
                      d.descuento, d.expira, COALESCE(d.enlace, c.enlace) AS enlace, d.cupon_id
               FROM destacados d
               LEFT JOIN cupones c ON c.id = d.cupon_id

@@ -7,6 +7,59 @@ use MkZero\Servidor\Respuesta\RespuestaJson;
 
 require __DIR__ . '/vendor/autoload.php';
 
+error_reporting(E_ALL);
+$errorEmitido = false;
+$emitirErrorJson = static function (string $mensaje, int $status = 500, array $contexto = []) use (&$errorEmitido): void {
+  if ($errorEmitido) {
+    return;
+  }
+  $errorEmitido = true;
+  if (!headers_sent()) {
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code($status);
+  }
+  echo json_encode([
+    'estado' => 'error',
+    'mensaje' => $mensaje,
+    'detalles' => $contexto,
+  ], JSON_UNESCAPED_UNICODE);
+};
+
+set_error_handler(static function (int $severity, string $message, string $file = '', int $line = 0): bool {
+  if (!(error_reporting() & $severity)) {
+    return false;
+  }
+  throw new \ErrorException($message, 0, $severity, $file, $line);
+});
+
+set_exception_handler(static function (\Throwable $ex) use ($emitirErrorJson): void {
+  $emitirErrorJson('Error interno en el servidor.', 500, [
+    'tipo' => get_class($ex),
+    'mensaje' => $ex->getMessage(),
+    'archivo' => $ex->getFile(),
+    'linea' => $ex->getLine(),
+  ]);
+});
+
+register_shutdown_function(static function () use ($emitirErrorJson): void {
+  $error = error_get_last();
+  if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+    $emitirErrorJson('Error fatal en el servidor.', 500, [
+      'tipo' => $error['type'],
+      'mensaje' => $error['message'],
+      'archivo' => $error['file'],
+      'linea' => $error['line'],
+    ]);
+  }
+});
+
+$uri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$rutaArchivo = __DIR__ . $uri;
+
+if ($uri !== '/' && file_exists($rutaArchivo) && !is_dir($rutaArchivo)) {
+  return false; // Permitir archivos estáticos reales
+}
+
 // Configuración de conexión (puede sobrescribirse con variables de entorno)
 $configuracion = require __DIR__ . '/config/database.php';
 $conexion = new Conexion($configuracion);
@@ -33,7 +86,13 @@ if (empty($allowedOrigins)) {
 }
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowedOrigins, true)) {
+$originNormalizado = rtrim($origin, '/');
+$allowedOriginsNormalizados = array_map(
+  static fn($permitido) => rtrim($permitido, '/'),
+  $allowedOrigins
+);
+
+if ($origin !== '' && in_array($originNormalizado, $allowedOriginsNormalizados, true)) {
   header('Access-Control-Allow-Origin: ' . $origin);
   header('Access-Control-Allow-Credentials: true');
   header('Vary: Origin');

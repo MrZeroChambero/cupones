@@ -68,7 +68,12 @@ function App() {
         setDestacados(listaDestacados);
         setCategorias(listaCategorias);
       } catch (error) {
-        setEstadoCarga({ cargando: false, error: error.message });
+        console.error("Fallo al cargar datos desde el backend", error);
+        setEstadoCarga({
+          cargando: false,
+          error:
+            "Ocurrió un error en el backend. Revisa la consola para más detalles.",
+        });
         return;
       }
       setEstadoCarga({ cargando: false, error: "" });
@@ -178,7 +183,16 @@ function App() {
               />
             }
           />
-          <Route path="/categorias" element={<PaginaCategorias />} />
+          <Route
+            path="/categorias"
+            element={
+              <PaginaCategorias
+                categorias={categorias}
+                cargando={estadoCarga.cargando}
+                error={estadoCarga.error}
+              />
+            }
+          />
           <Route path="*" element={<PaginaNoEncontrada />} />
         </Route>
       </Routes>

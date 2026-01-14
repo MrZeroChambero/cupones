@@ -23,7 +23,6 @@ return function (\AltoRouter $router, Conexion $conexion): void {
     __DIR__ . '/Categoria/RutasCategoria.php',
     __DIR__ . '/Promocion/RutasPromocion.php',
   ];
-
   foreach ($archivosRutas as $archivo) {
     if (!is_file($archivo)) {
       continue;

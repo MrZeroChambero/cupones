@@ -1,139 +1,214 @@
 import axios from "axios";
+import { API_BASE_URL, API_ENDPOINTS, usarMocks } from "../config/api";
 
-// Permite forzar mocks desde .env (útil para desarrollo sin backend)
-const usaMocksLocales = (import.meta.env.VITE_USAR_MOCKS ?? "false") === "true";
+const BASE_API_URL = usarMocks ? "/api" : API_BASE_URL;
 
-const limpiarHost = (host) => host.replace(/\/+$/, "");
-const asegurarPath = (ruta) => {
-  if (!ruta) return "/cupones/servidor";
-  return ruta.startsWith("/") ? ruta : `/${ruta}`;
+export const ENDPOINTS = usarMocks
+  ? {
+      cupones: `${BASE_API_URL}/cupones.json`,
+      destacados: `${BASE_API_URL}/destacados.json`,
+      categorias: `${BASE_API_URL}/categorias.json`,
+    }
+  : { ...API_ENDPOINTS };
+
+const extraerContenido = (respuestaAxios) => {
+  const crudo = respuestaAxios?.data;
+  if (
+    crudo &&
+    typeof crudo === "object" &&
+    !Array.isArray(crudo) &&
+    Object.prototype.hasOwnProperty.call(crudo, "data")
+  ) {
+    return crudo.data ?? {};
+  }
+  return crudo;
 };
 
-const apiHost = limpiarHost(import.meta.env.VITE_API_HOST || "http://localhost");
-const apiPort = import.meta.env.VITE_API_PORT || "80";
-const apiPath = asegurarPath(import.meta.env.VITE_API_PATH || "/cupones/servidor");
-const hostYaTienePuerto = /:\d+$/.test(apiHost.replace(/^https?:\/\//i, ""));
-const puertoFinal = apiPort && !hostYaTienePuerto ? `:${apiPort}` : "";
-const baseInferida = `${apiHost}${puertoFinal}${apiPath}`;
-
-// Si no se define VITE_API_BASE_URL se construye usando host + puerto + path
-const baseBackend = (import.meta.env.VITE_API_BASE_URL || baseInferida).replace(/\/+$/, "");
-
-// La base final dependerá de si usamos mocks o la API real
-const BASE_API_URL = usaMocksLocales ? "/api" : baseBackend;
-
-export const ENDPOINTS = {
-  cupones: usaMocksLocales ? `${BASE_API_URL}/cupones.json` : `${BASE_API_URL}/cupones`,
-  destacados: usaMocksLocales ? `${BASE_API_URL}/destacados.json` : `${BASE_API_URL}/destacados`,
-  categorias: usaMocksLocales ? `${BASE_API_URL}/categorias.json` : `${BASE_API_URL}/categorias`,
+const extraerListado = (payload, clave) => {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  if (payload && typeof payload === "object") {
+    if (Array.isArray(payload[clave])) {
+      return payload[clave];
+    }
+  }
+  return [];
 };
 
-const obtenerEtiquetaOrigen = () => (usaMocksLocales ? "MOCK" : "BACKEND");
+const obtenerEtiquetaOrigen = () => (usarMocks ? "MOCK" : "BACKEND");
 
-const registrarSolicitudBackend = (endpoint, url) => {
-  console.info(`[${obtenerEtiquetaOrigen()}] Solicitud ${endpoint}: ${url}`);
+const registrarSolicitudBackend = (
+  descriptor,
+  { url, metodo, cuerpo, config }
+) => {
+  console.log(`[${obtenerEtiquetaOrigen()}] Solicitud ${descriptor}:`, {
+    url,
+    metodo,
+    cuerpo,
+    config,
+  });
 };
 
-const registrarRespuestaBackend = (endpoint, data) => {
-  // Logging informativo para verificar lo que responde el backend real o los mocks locales
-  console.info(`[${obtenerEtiquetaOrigen()}] Respuesta ${endpoint}:`, data);
+const registrarRespuestaBackend = (
+  endpoint,
+  respuestaCompleta,
+  opciones = {}
+) => {
+  const { esError = false } = opciones;
+  const estado = esError ? "Respuesta con error" : "Respuesta";
+  const etiqueta = `[${obtenerEtiquetaOrigen()}] ${estado} ${endpoint}`;
+  if (!respuestaCompleta) {
+    console.log(`${etiqueta}: <sin respuesta>`);
+    return;
+  }
+
+  const payload = respuestaCompleta.data;
+  const rawText = respuestaCompleta.request?.responseText;
+  const mensajePrioritario =
+    typeof payload === "string"
+      ? payload
+      : rawText || JSON.stringify(payload, null, 2);
+
+  console.log(`${etiqueta} (detalle principal):`, mensajePrioritario);
+  console.log(`${etiqueta} (objeto Axios completo):`, respuestaCompleta);
+};
+
+const construirErrorNormalizado = (error) => {
+  const respuesta = error?.response;
+  const payload = respuesta?.data;
+  let mensajeDesdePayload = "";
+
+  if (payload && typeof payload === "object") {
+    mensajeDesdePayload = payload.message ?? payload.mensaje ?? "";
+  } else if (typeof payload === "string") {
+    mensajeDesdePayload = payload.trim();
+  }
+
+  const mensaje =
+    mensajeDesdePayload ||
+    respuesta?.statusText ||
+    error.message ||
+    "Error desconocido";
+
+  const err = new Error(mensaje);
+  if (payload && typeof payload === "object") {
+    if (payload.errors || payload.errores) {
+      err.detalle = payload.errors ?? payload.errores;
+    }
+  } else if (typeof payload === "string" && payload.trim()) {
+    err.detalle = payload.trim();
+  }
+  if (respuesta?.status) {
+    err.status = respuesta.status;
+  }
+  if (payload !== undefined) {
+    err.payload = payload;
+  }
+  return err;
+};
+
+const manejarError = (error) => {
+  throw construirErrorNormalizado(error);
+};
+
+const ejecutarSolicitud = async ({
+  metodo = "GET",
+  endpointKey,
+  descriptor,
+  cuerpo,
+  config,
+}) => {
+  const url = ENDPOINTS[endpointKey];
+  const metodoNormalizado = metodo.toUpperCase();
+  registrarSolicitudBackend(descriptor, {
+    url,
+    metodo: metodoNormalizado,
+    cuerpo,
+    config,
+  });
+
+  try {
+    const respuesta =
+      metodoNormalizado === "POST"
+        ? await axios.post(url, cuerpo, config)
+        : await axios.get(url, config);
+    registrarRespuestaBackend(descriptor, respuesta);
+    return extraerContenido(respuesta);
+  } catch (error) {
+    if (error?.response) {
+      registrarRespuestaBackend(descriptor, error.response, { esError: true });
+    }
+    console.error(`[${obtenerEtiquetaOrigen()}] Error ${descriptor}`, error);
+    manejarError(error);
+  }
+
+  return undefined;
+};
+
+const consumirListado = async (endpointKey, descriptor, tipoRespuesta) => {
+  const contenido = await ejecutarSolicitud({
+    metodo: "GET",
+    endpointKey,
+    descriptor,
+  });
+  return manejarRespuestas(tipoRespuesta, contenido);
 };
 
 // Switch central para estandarizar cada tipo de respuesta usando funciones flecha
 const manejarRespuestas = (tipoRespuesta, payload) => {
   switch (tipoRespuesta) {
-    case "cupones": {
-      const formatearCupones = () => (Array.isArray(payload?.cupones) ? payload.cupones : []);
-      return formatearCupones();
-    }
-    case "destacados": {
-      const organizarDestacados = () => (Array.isArray(payload?.destacados) ? payload.destacados : []);
-      return organizarDestacados();
-    }
-    case "mensaje": {
-      const devolverMensaje = () => payload?.mensaje ?? "Operación completada";
-      return devolverMensaje();
-    }
-    default: {
-      const retornoSeguro = () => payload;
-      return retornoSeguro();
-    }
+    case "cupones":
+      return extraerListado(payload, "cupones");
+    case "destacados":
+      return extraerListado(payload, "destacados");
+    case "categorias":
+      return extraerListado(payload, "categorias");
+    case "mensaje":
+      return payload?.message ?? payload?.mensaje ?? "Operación completada";
+    default:
+      return payload;
   }
-};
-
-const manejarError = (error) => {
-  // Generamos un Error con el contrato que espera la UI para mostrar alertas
-  const construirError = () => {
-    const mensaje = error?.response?.data?.mensaje || error.message || "Error desconocido";
-    const err = new Error(mensaje);
-    if (error?.response?.data?.errores) {
-      err.detalle = error.response.data.errores;
-    }
-    if (error?.response?.status) {
-      err.status = error.response.status;
-    }
-    return err;
-  };
-  throw construirError();
 };
 
 export const obtenerCupones = async () => {
-  try {
-    registrarSolicitudBackend("GET /cupones", ENDPOINTS.cupones);
-    const respuesta = await axios.get(ENDPOINTS.cupones);
-    registrarRespuestaBackend("GET /cupones", respuesta.data);
-    return manejarRespuestas("cupones", respuesta.data);
-  } catch (error) {
-    console.error(`[${obtenerEtiquetaOrigen()}] Error GET /cupones`, error);
-    manejarError(error);
-  }
+  return consumirListado("cupones", "GET /cupones", "cupones");
 };
 
 export const obtenerDestacados = async () => {
-  try {
-    registrarSolicitudBackend("GET /destacados", ENDPOINTS.destacados);
-    const respuesta = await axios.get(ENDPOINTS.destacados);
-    registrarRespuestaBackend("GET /destacados", respuesta.data);
-    return manejarRespuestas("destacados", respuesta.data);
-  } catch (error) {
-    console.error(`[${obtenerEtiquetaOrigen()}] Error GET /destacados`, error);
-    manejarError(error);
-  }
+  return consumirListado("destacados", "GET /destacados", "destacados");
 };
 
 export const obtenerCategorias = async () => {
-  if (usaMocksLocales) {
+  if (usarMocks) {
     console.warn("[MOCK] No hay categorias.json, devolviendo []");
     return [];
   }
-  try {
-    registrarSolicitudBackend("GET /categorias", ENDPOINTS.categorias);
-    const respuesta = await axios.get(ENDPOINTS.categorias);
-    registrarRespuestaBackend("GET /categorias", respuesta.data);
-    return Array.isArray(respuesta?.data?.categorias) ? respuesta.data.categorias : [];
-  } catch (error) {
-    console.error(`[${obtenerEtiquetaOrigen()}] Error GET /categorias`, error);
-    manejarError(error);
-  }
+  return consumirListado("categorias", "GET /categorias", "categorias");
 };
 
 export const crearCupon = async (payload) => {
-  if (usaMocksLocales) {
+  if (usarMocks) {
     throw new Error("No se pueden crear cupones cuando se usan mocks locales");
   }
-  try {
-    registrarSolicitudBackend("POST /cupones", ENDPOINTS.cupones);
-    const esFormData = typeof FormData !== "undefined" && payload instanceof FormData;
-    const configuracion = esFormData
-      ? {}
-      : {
-          headers: { "Content-Type": "application/json" },
-        };
-    const respuesta = await axios.post(ENDPOINTS.cupones, payload, configuracion);
-    registrarRespuestaBackend("POST /cupones", respuesta.data);
-    return respuesta?.data?.cupon ?? null;
-  } catch (error) {
-    console.error(`[${obtenerEtiquetaOrigen()}] Error POST /cupones`, error);
-    manejarError(error);
+  const esFormData =
+    typeof FormData !== "undefined" && payload instanceof FormData;
+  const configuracion = esFormData
+    ? {}
+    : {
+        headers: { "Content-Type": "application/json" },
+      };
+
+  const contenido = await ejecutarSolicitud({
+    metodo: "POST",
+    endpointKey: "cupones",
+    descriptor: "POST /cupones",
+    cuerpo: payload,
+    config: configuracion,
+  });
+
+  if (contenido && typeof contenido === "object") {
+    return contenido.cupon ?? null;
   }
+  return null;
 };

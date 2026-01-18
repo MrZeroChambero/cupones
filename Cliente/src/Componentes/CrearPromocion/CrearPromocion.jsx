@@ -8,14 +8,9 @@ const ESTADOS_DISPONIBLES = [
 ];
 
 const TIPOS_IMAGEN = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const TIPOS_ICONO = [
-  "image/png",
-  "image/svg+xml",
-  "image/x-icon",
-  "image/vnd.microsoft.icon",
-];
+const TIPOS_ICONO = ["image/jpeg", "image/png", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon"];
 const TIPOS_IMAGEN_TEXTO = "JPG, PNG, WEBP o GIF";
-const TIPOS_ICONO_TEXTO = "PNG, SVG o ICO";
+const TIPOS_ICONO_TEXTO = "JPG, PNG, SVG o ICO";
 
 const inicialFormulario = {
   marca: "",
@@ -26,12 +21,7 @@ const inicialFormulario = {
   rating: "4.5",
 };
 
-const CrearPromocion = ({
-  visible,
-  enProceso = false,
-  onCerrar,
-  onGuardar,
-}) => {
+const CrearPromocion = ({ visible, enProceso = false, onCerrar, onGuardar }) => {
   const [formulario, setFormulario] = useState(inicialFormulario);
   const [archivos, setArchivos] = useState({ imagen: null, icono: null });
   const [errores, setErrores] = useState({});
@@ -121,9 +111,7 @@ const CrearPromocion = ({
     try {
       await onGuardar?.(payload);
     } catch (error) {
-      const mensaje =
-        error?.message ??
-        "No se pudo guardar la promoción. Inténtalo nuevamente.";
+      const mensaje = error?.message ?? "No se pudo guardar la promoción. Inténtalo nuevamente.";
       setMensajeGeneral(mensaje);
     }
   };
@@ -133,60 +121,35 @@ const CrearPromocion = ({
     return (
       <div className="mb-3">
         <label className="form-label fw-semibold">{etiqueta}</label>
-        <div
-          className={`upload-dropzone ${errores[campo] ? "is-invalid" : ""}`}
-        >
+        <div className={`upload-dropzone ${errores[campo] ? "is-invalid" : ""}`}>
           <FiImage aria-hidden="true" />
           <div>
-            <p className="mb-0 fw-semibold">
-              {archivoSeleccionado
-                ? archivoSeleccionado.name
-                : "Selecciona un archivo"}
-            </p>
+            <p className="mb-0 fw-semibold">{archivoSeleccionado ? archivoSeleccionado.name : "Selecciona un archivo"}</p>
             <p className="text-body-secondary small mb-0">{descripcion}</p>
           </div>
           <label className="btn btn-outline-accent btn-sm mb-0">
             <span className="d-inline-flex align-items-center gap-2">
               <FiUpload aria-hidden="true" /> Subir
             </span>
-            <input
-              type="file"
-              accept={tiposLegibles}
-              className="d-none"
-              onChange={(e) => actualizarArchivo(campo, e.target.files)}
-            />
+            <input type="file" accept={tiposLegibles} className="d-none" onChange={(e) => actualizarArchivo(campo, e.target.files)} />
           </label>
         </div>
-        {errores[campo] && (
-          <div className="invalid-feedback d-block">{errores[campo]}</div>
-        )}
+        {errores[campo] && <div className="invalid-feedback d-block">{errores[campo]}</div>}
       </div>
     );
   };
 
   return (
     <>
-      <div
-        className="modal fade show d-block"
-        role="dialog"
-        aria-modal="true"
-        tabIndex={-1}
-      >
+      <div className="modal fade show d-block" role="dialog" aria-modal="true" tabIndex={-1}>
         <div className="modal-dialog modal-dialog-centered modal-lg">
           <div className="modal-content bg-panel border-light-subtle shadow-lg position-relative">
-            <button
-              type="button"
-              className="modal-close-circle"
-              aria-label="Cerrar"
-              onClick={onCerrar}
-            >
+            <button type="button" className="modal-close-circle" aria-label="Cerrar" onClick={onCerrar}>
               <FiX size={18} />
             </button>
             <div className="modal-header border-0 pt-4 pb-0 ps-4 pe-5">
               <div>
-                <p className="text-body-secondary small mb-1">
-                  Nueva promoción
-                </p>
+                <p className="text-body-secondary small mb-1">Nueva promoción</p>
                 <h5 className="modal-title fw-bold">Crear campaña destacada</h5>
               </div>
             </div>
@@ -198,104 +161,66 @@ const CrearPromocion = ({
               )}
               <div className="row g-3">
                 <div className="col-md-6">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="marca-promocion"
-                  >
+                  <label className="form-label fw-semibold" htmlFor="marca-promocion">
                     Marca
                   </label>
                   <input
                     id="marca-promocion"
                     type="text"
-                    className={`form-control ${
-                      errores.marca ? "is-invalid" : ""
-                    }`}
+                    className={`form-control ${errores.marca ? "is-invalid" : ""}`}
                     value={formulario.marca}
                     onChange={(e) => actualizarCampo("marca", e.target.value)}
                     placeholder="Ej. ShopiTech"
                   />
-                  {errores.marca && (
-                    <div className="invalid-feedback">{errores.marca}</div>
-                  )}
+                  {errores.marca && <div className="invalid-feedback">{errores.marca}</div>}
                 </div>
                 <div className="col-md-6">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="nombre-promocion"
-                  >
+                  <label className="form-label fw-semibold" htmlFor="nombre-promocion">
                     Nombre comercial
                   </label>
                   <input
                     id="nombre-promocion"
                     type="text"
-                    className={`form-control ${
-                      errores.nombre ? "is-invalid" : ""
-                    }`}
+                    className={`form-control ${errores.nombre ? "is-invalid" : ""}`}
                     value={formulario.nombre}
                     onChange={(e) => actualizarCampo("nombre", e.target.value)}
                     placeholder="Ej. Semana Gamer"
                   />
-                  {errores.nombre && (
-                    <div className="invalid-feedback">{errores.nombre}</div>
-                  )}
+                  {errores.nombre && <div className="invalid-feedback">{errores.nombre}</div>}
                 </div>
                 <div className="col-12">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="detalles-promocion"
-                  >
+                  <label className="form-label fw-semibold" htmlFor="detalles-promocion">
                     Detalles
                   </label>
                   <textarea
                     id="detalles-promocion"
-                    className={`form-control ${
-                      errores.detalles ? "is-invalid" : ""
-                    }`}
+                    className={`form-control ${errores.detalles ? "is-invalid" : ""}`}
                     rows={3}
                     value={formulario.detalles}
-                    onChange={(e) =>
-                      actualizarCampo("detalles", e.target.value)
-                    }
+                    onChange={(e) => actualizarCampo("detalles", e.target.value)}
                     placeholder="Describe los beneficios principales"
                   />
-                  {errores.detalles && (
-                    <div className="invalid-feedback">{errores.detalles}</div>
-                  )}
+                  {errores.detalles && <div className="invalid-feedback">{errores.detalles}</div>}
                 </div>
                 <div className="col-md-4">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="cupones-promocion"
-                  >
+                  <label className="form-label fw-semibold" htmlFor="cupones-promocion">
                     Cupones activos
                   </label>
                   <input
                     id="cupones-promocion"
                     type="number"
                     min={1}
-                    className={`form-control ${
-                      errores.cupones ? "is-invalid" : ""
-                    }`}
+                    className={`form-control ${errores.cupones ? "is-invalid" : ""}`}
                     value={formulario.cupones}
                     onChange={(e) => actualizarCampo("cupones", e.target.value)}
                   />
-                  {errores.cupones && (
-                    <div className="invalid-feedback">{errores.cupones}</div>
-                  )}
+                  {errores.cupones && <div className="invalid-feedback">{errores.cupones}</div>}
                 </div>
                 <div className="col-md-4">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="estado-promocion"
-                  >
+                  <label className="form-label fw-semibold" htmlFor="estado-promocion">
                     Estado
                   </label>
-                  <select
-                    id="estado-promocion"
-                    className="form-select"
-                    value={formulario.estado}
-                    onChange={(e) => actualizarCampo("estado", e.target.value)}
-                  >
+                  <select id="estado-promocion" className="form-select" value={formulario.estado} onChange={(e) => actualizarCampo("estado", e.target.value)}>
                     {ESTADOS_DISPONIBLES.map((estado) => (
                       <option key={estado.value} value={estado.value}>
                         {estado.label}
@@ -304,10 +229,7 @@ const CrearPromocion = ({
                   </select>
                 </div>
                 <div className="col-md-4">
-                  <label
-                    className="form-label fw-semibold"
-                    htmlFor="rating-promocion"
-                  >
+                  <label className="form-label fw-semibold" htmlFor="rating-promocion">
                     Rating
                   </label>
                   <input
@@ -316,51 +238,24 @@ const CrearPromocion = ({
                     step="0.1"
                     min={0}
                     max={5}
-                    className={`form-control ${
-                      errores.rating ? "is-invalid" : ""
-                    }`}
+                    className={`form-control ${errores.rating ? "is-invalid" : ""}`}
                     value={formulario.rating}
                     onChange={(e) => actualizarCampo("rating", e.target.value)}
                   />
-                  {errores.rating && (
-                    <div className="invalid-feedback">{errores.rating}</div>
-                  )}
+                  {errores.rating && <div className="invalid-feedback">{errores.rating}</div>}
                 </div>
               </div>
 
               <div className="row mt-3">
-                <div className="col-md-6">
-                  {renderInputArchivo(
-                    "imagen",
-                    "Imagen principal",
-                    TIPOS_IMAGEN.join(","),
-                    TIPOS_IMAGEN_TEXTO
-                  )}
-                </div>
-                <div className="col-md-6">
-                  {renderInputArchivo(
-                    "icono",
-                    "Icono",
-                    TIPOS_ICONO.join(","),
-                    TIPOS_ICONO_TEXTO
-                  )}
-                </div>
+                <div className="col-md-6">{renderInputArchivo("imagen", "Imagen principal", TIPOS_IMAGEN.join(","), TIPOS_IMAGEN_TEXTO)}</div>
+                <div className="col-md-6">{renderInputArchivo("icono", "Icono", TIPOS_ICONO.join(","), TIPOS_ICONO_TEXTO)}</div>
               </div>
 
               <div className="d-flex justify-content-end gap-2 mt-4">
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary"
-                  onClick={onCerrar}
-                  disabled={enProceso}
-                >
+                <button type="button" className="btn btn-outline-secondary" onClick={onCerrar} disabled={enProceso}>
                   Cancelar
                 </button>
-                <button
-                  type="submit"
-                  className="btn btn-accent"
-                  disabled={enProceso}
-                >
+                <button type="submit" className="btn btn-accent" disabled={enProceso}>
                   {enProceso ? "Guardando..." : "Guardar promoción"}
                 </button>
               </div>

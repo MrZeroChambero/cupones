@@ -1,13 +1,7 @@
 import { FiRefreshCcw } from "react-icons/fi";
 import TarjetaCupon from "./TarjetaCupon";
 
-const BarraLateral = ({
-  nuevosCupones,
-  cargando,
-  error,
-  cuponesRevelados,
-  onRevelarCodigo,
-}) => {
+const BarraLateral = ({ promocionesDestacadas, cargando, error, cuponesRevelados, onRevelarCodigo }) => {
   const contenido = () => {
     // Respuesta dinámica según estado de carga de los nuevos cupones
     if (cargando) {
@@ -16,19 +10,11 @@ const BarraLateral = ({
     if (error) {
       return <p className="text-danger">{error}</p>;
     }
-    if (!nuevosCupones.length) {
+    if (!promocionesDestacadas.length) {
       return <p className="text-body-secondary">Aún no hay cupones nuevos.</p>;
     }
 
-    return nuevosCupones.map((cupon) => (
-      <TarjetaCupon
-        key={cupon.id}
-        cupon={cupon}
-        estaRevelado={cuponesRevelados.includes(cupon.id)}
-        onRevelar={onRevelarCodigo}
-        modo="compacto"
-      />
-    ));
+    return promocionesDestacadas.map((cupon) => <TarjetaCupon key={cupon.id} cupon={cupon} estaRevelado={cuponesRevelados.includes(cupon.id)} onRevelar={onRevelarCodigo} modo="compacto" />);
   };
 
   return (
@@ -38,7 +24,7 @@ const BarraLateral = ({
           <p className="text-body-secondary small mb-1 d-flex align-items-center gap-2">
             <FiRefreshCcw aria-hidden="true" /> Actualizado en vivo
           </p>
-          <h2 className="h5 mb-0">Cupones recién llegados</h2>
+          <h2 className="h5 mb-0">Cupones destacados</h2>
         </div>
       </div>
       {contenido()}

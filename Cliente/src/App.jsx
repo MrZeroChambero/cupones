@@ -9,14 +9,7 @@ import PaginaNoEncontrada from "./Componentes/paginas/PaginaNoEncontrada";
 import ModalCodigoCupon from "./Componentes/ModalCodigoCupon";
 import ModalNuevoCupon from "./Componentes/ModalNuevoCupon";
 import CrearPromocion from "./Componentes/CrearPromocion/CrearPromocion";
-import {
-  obtenerCupones,
-  obtenerDestacados,
-  obtenerCategorias,
-  crearCupon,
-  obtenerPromociones,
-  crearPromocion,
-} from "./services/solicitudes";
+import { obtenerCupones, obtenerDestacados, obtenerCategorias, crearCupon, obtenerPromociones, crearPromocion } from "./services/solicitudes";
 const TEMA_STORAGE_KEY = "bombcoupons-tema";
 
 const obtenerTemaPreferido = () => {
@@ -27,9 +20,7 @@ const obtenerTemaPreferido = () => {
   if (temaGuardado === "claro" || temaGuardado === "oscuro") {
     return temaGuardado;
   }
-  const prefiereOscuro = window.matchMedia?.(
-    "(prefers-color-scheme: dark)"
-  ).matches;
+  const prefiereOscuro = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
   return prefiereOscuro ? "oscuro" : "claro";
 };
 
@@ -44,17 +35,14 @@ function App() {
   const [cuponActivo, setCuponActivo] = useState(null);
   const [modalNuevoCuponAbierto, setModalNuevoCuponAbierto] = useState(false);
   const [creandoCupon, setCreandoCupon] = useState(false);
-  const [modalNuevaPromocionAbierto, setModalNuevaPromocionAbierto] =
-    useState(false);
+  const [modalNuevaPromocionAbierto, setModalNuevaPromocionAbierto] = useState(false);
   const [creandoPromocion, setCreandoPromocion] = useState(false);
+  const [terminoBusqueda, setTerminoBusqueda] = useState("");
 
   useEffect(() => {
     // Reflejamos el modo en data-tema y en data-bs-theme para sincronizar Bootstrap
     document.documentElement.dataset.tema = tema;
-    document.documentElement.setAttribute(
-      "data-bs-theme",
-      tema === "oscuro" ? "dark" : "light"
-    );
+    document.documentElement.setAttribute("data-bs-theme", tema === "oscuro" ? "dark" : "light");
     if (typeof window !== "undefined") {
       window.localStorage.setItem(TEMA_STORAGE_KEY, tema);
     }
@@ -65,17 +53,7 @@ function App() {
     const cargarDatos = async () => {
       try {
         setEstadoCarga({ cargando: true, error: "" });
-        const [
-          listaCupones,
-          listaDestacados,
-          listaCategorias,
-          listaPromociones,
-        ] = await Promise.all([
-          obtenerCupones(),
-          obtenerDestacados(),
-          obtenerCategorias(),
-          obtenerPromociones(),
-        ]);
+        const [listaCupones, listaDestacados, listaCategorias, listaPromociones] = await Promise.all([obtenerCupones(), obtenerDestacados(), obtenerCategorias(), obtenerPromociones()]);
         setCupones(listaCupones);
         setDestacados(listaDestacados);
         setCategorias(listaCategorias);
@@ -84,8 +62,7 @@ function App() {
         console.error("Fallo al cargar datos desde el backend", error);
         setEstadoCarga({
           cargando: false,
-          error:
-            "Ocurrió un error en el backend. Revisa la consola para más detalles.",
+          error: "Ocurrió un error en el backend. Revisa la consola para más detalles.",
         });
         return;
       }
@@ -95,6 +72,13 @@ function App() {
   }, []);
 
   const nuevosCupones = useMemo(() => cupones.slice(0, 4), [cupones]);
+  const promocionesDestacadas = useMemo(() => {
+    // 1. Buscamos cuál es el rating más alto disponible
+    const maxRating = Math.max(...promociones.map((p) => p.rating), 0);
+
+    // 2. Filtramos y devolvemos TODOS los que tengan ese rating
+    return promociones.filter((promo) => promo.rating === maxRating);
+  }, [promociones]);
 
   const alternarTema = () => {
     setTema((prevTema) => (prevTema === "claro" ? "oscuro" : "claro"));
@@ -109,9 +93,7 @@ function App() {
     if (cup) {
       return cup;
     }
-    const destacadoRelacionado = destacados.find(
-      (item) => item.cuponId === cuponId || item.id === cuponId
-    );
+    const destacadoRelacionado = destacados.find((item) => item.cuponId === cuponId || item.id === cuponId);
     if (destacadoRelacionado) {
       return {
         id: cuponId,
@@ -127,9 +109,7 @@ function App() {
   };
 
   const manejarCodigoVisible = (cuponId, fallback = null) => {
-    setCuponesRevelados((prev) =>
-      prev.includes(cuponId) ? prev : [...prev, cuponId]
-    );
+    setCuponesRevelados((prev) => (prev.includes(cuponId) ? prev : [...prev, cuponId]));
     const cuponSeleccionado = construirCuponParaModal(cuponId, fallback);
     setCuponActivo(cuponSeleccionado ?? null);
   };
@@ -169,6 +149,8 @@ function App() {
     }
   };
 
+  console.log(terminoBusqueda);
+
   return (
     <>
       <Routes>
@@ -177,12 +159,13 @@ function App() {
             <LayoutPrincipal
               tema={tema}
               onCambiarTema={alternarTema}
-              nuevosCupones={nuevosCupones}
+              promocionesDestacadas={promocionesDestacadas}
               cargando={estadoCarga.cargando}
               error={estadoCarga.error}
               cuponesRevelados={cuponesRevelados}
               onRevelarCodigo={manejarCodigoVisible}
               onAbrirModalNuevoCupon={abrirModalNuevoCupon}
+              setTerminoBusqueda={setTerminoBusqueda}
             />
           }
         >
@@ -205,45 +188,23 @@ function App() {
             path="/cupones"
             element={
               <PaginaCupones
+                promos={promociones}
                 cupones={cupones}
                 cargando={estadoCarga.cargando}
                 error={estadoCarga.error}
                 cuponesRevelados={cuponesRevelados}
                 onRevelarCodigo={manejarCodigoVisible}
+                busqueda={terminoBusqueda}
               />
             }
           />
-          <Route
-            path="/categorias"
-            element={
-              <PaginaCategorias
-                categorias={categorias}
-                cargando={estadoCarga.cargando}
-                error={estadoCarga.error}
-              />
-            }
-          />
+          <Route path="/categorias" element={<PaginaCategorias categorias={categorias} cargando={estadoCarga.cargando} error={estadoCarga.error} />} />
           <Route path="*" element={<PaginaNoEncontrada />} />
         </Route>
       </Routes>
-      <ModalCodigoCupon
-        cupon={cuponActivo}
-        visible={Boolean(cuponActivo)}
-        onCerrar={cerrarModalCupon}
-      />
-      <ModalNuevoCupon
-        visible={modalNuevoCuponAbierto}
-        categorias={categorias}
-        enProceso={creandoCupon}
-        onCerrar={cerrarModalNuevoCupon}
-        onGuardar={manejarCrearCupon}
-      />
-      <CrearPromocion
-        visible={modalNuevaPromocionAbierto}
-        enProceso={creandoPromocion}
-        onCerrar={cerrarModalNuevaPromocion}
-        onGuardar={manejarCrearPromocion}
-      />
+      <ModalCodigoCupon cupon={cuponActivo} visible={Boolean(cuponActivo)} onCerrar={cerrarModalCupon} />
+      <ModalNuevoCupon visible={modalNuevoCuponAbierto} categorias={categorias} enProceso={creandoCupon} onCerrar={cerrarModalNuevoCupon} onGuardar={manejarCrearCupon} />
+      <CrearPromocion visible={modalNuevaPromocionAbierto} enProceso={creandoPromocion} onCerrar={cerrarModalNuevaPromocion} onGuardar={manejarCrearPromocion} />
     </>
   );
 }

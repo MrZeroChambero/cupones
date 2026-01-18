@@ -1,0 +1,278 @@
+/* Overlay con Blur */
+.custom-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
+  backdrop-filter: blur(8px); /* Efecto de desenfoque de fondo */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Contenedor del Modal con Animación */
+.custom-modal-container {
+  background: #1a1e26;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 16px;
+  overflow: hidden;
+  color: white;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  font-family: "Inter", sans-serif;
+
+  /* Animación de entrada: escala y opacidad */
+  transform: scale(0.9);
+  opacity: 0;
+  animation: scaleUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+}
+
+/* Keyframes para las animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(0.85) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* --- Resto de estilos (igual al anterior pero refinado) --- */
+
+.modal-header-section {
+  height: 180px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+/* El degradado superior para que el contenido sea legible */
+.modal-header-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(26, 30, 38, 0.3) 0%, #1a1e26 100%);
+}
+
+.header-content {
+  position: relative;
+  display: flex;
+  gap: 15px;
+  z-index: 2;
+  align-items: center;
+}
+
+.brand-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
+}
+.brand-category {
+  font-size: 0.75rem;
+  color: #a1a1aa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-item {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  color: #d1d1d6;
+}
+.badge-item.green {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.1);
+}
+
+/* Ticket */
+.ticket-container {
+  padding: 25px 0;
+  display: flex;
+  justify-content: center;
+}
+.ticket-shape {
+  background: #ffedd5;
+  color: #f97316;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  position: relative;
+  width: 85%;
+}
+
+.ticket-title {
+  display: block;
+  font-weight: 800;
+  font-size: 1.5rem;
+  text-transform: capitalize;
+}
+.ticket-subtitle {
+  font-size: 0.85rem;
+  color: #9a3412;
+  opacity: 0.8;
+}
+
+.punch-hole {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: #1a1e26; /* Debe coincidir con el fondo del modal */
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.punch-hole.left {
+  left: -11px;
+}
+.punch-hole.right {
+  right: -11px;
+}
+
+/* Botón Revelar con estilo Hytale */
+.reveal-container {
+  background: #232933;
+  display: flex;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  transition: transform 0.2s ease;
+}
+
+.reveal-container:hover {
+  transform: translateY(-2px);
+}
+
+.reveal-btn {
+  background: #f97316;
+  border: none;
+  color: white;
+  padding: 16px 20px;
+  font-weight: 700;
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.code-display {
+  padding: 0 20px;
+  font-family: "Monaco", monospace;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Estado del código bloqueado */
+.coupon-locked-box {
+  border: 2px dashed #444;
+  border-radius: 12px;
+  padding: 30px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.locked-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.locked-badge {
+  background: #222;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.blurred-code-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #f97316;
+  filter: blur(10px); /* Aquí está el truco */
+  user-select: none;
+}
+
+.get-full-code-btn {
+  background: #f97316;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.get-full-code-btn:hover {
+  background: #f97316;
+}
+
+/* Loader */
+.custom-loader {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #333;
+  border-top: 5px solid #f97316;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.reveal-btn-full {
+  width: 100%;
+  background: #f97316;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}

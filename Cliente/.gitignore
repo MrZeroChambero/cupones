@@ -7,12 +7,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies and build
 node_modules
 dist
 dist-ssr
 *.local
+
+# Assets (Keep folders but ignore content)
+# Ignoramos todo el contenido pero permitimos el archivo .gitkeep
 public/img/*
+!public/img/.gitkeep
+
 public/icons/*
+!public/icons/.gitkeep
 
 # Editor directories and files
 .vscode/*

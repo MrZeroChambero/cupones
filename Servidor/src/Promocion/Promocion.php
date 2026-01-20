@@ -9,19 +9,7 @@ use Throwable;
 
 class Promocion
 {
-  private const MIMES_IMAGENES = [
-    'image/jpeg' => 'jpg',
-    'image/png' => 'png',
-    'image/webp' => 'webp',
-    'image/gif' => 'gif',
-  ];
 
-  private const MIMES_ICONOS = [
-    'image/png' => 'png',
-    'image/svg+xml' => 'svg',
-    'image/x-icon' => 'ico',
-    'image/vnd.microsoft.icon' => 'ico',
-  ];
 
   private const TAMANIO_MAX_ARCHIVO = 5_000_000; // 5MB
 
@@ -81,14 +69,12 @@ class Promocion
 
       $imagenGuardada = $this->procesarArchivo(
         'imagen',
-        self::MIMES_IMAGENES,
         $this->directorioImagenes,
         '/img/'
       );
 
       $iconoGuardado = $this->procesarArchivo(
         'icono',
-        self::MIMES_ICONOS,
         $this->directorioIconos,
         '/icons/'
       );
@@ -210,7 +196,7 @@ class Promocion
     }
   }
 
-  private function procesarArchivo(string $campo, array $mimesPermitidos, string $directorio, string $prefijo): array
+  private function procesarArchivo(string $campo, string $directorio, string $prefijo): array
   {
     if (!isset($_FILES[$campo])) {
       throw new InvalidArgumentException("El archivo {$campo} es obligatorio.");
@@ -229,12 +215,28 @@ class Promocion
       throw new InvalidArgumentException("El archivo {$campo} supera el tamaño permitido de 5MB.");
     }
 
-    $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($archivo['tmp_name']) ?: '';
-    if (!isset($mimesPermitidos[$mime])) {
-      throw new InvalidArgumentException("El archivo {$campo} no tiene un formato permitido.");
+    $mime = mime_content_type($archivo['tmp_name']) ?: '';
+    $extensionSubida = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
+
+    $mimesPorExtension = [
+      'jpg' => ['image/jpeg'],
+      'jpeg' => ['image/jpeg'],
+      'png' => ['image/png'],
+      'webp' => ['image/webp'],
+      'gif' => ['image/gif'],
+      'svg' => ['image/svg+xml', 'text/xml', 'application/xml', 'text/plain'],
+      'ico' => ['image/x-icon', 'image/vnd.microsoft.icon'],
+    ];
+
+    if (!isset($mimesPorExtension[$extensionSubida])) {
+      throw new InvalidArgumentException("Extensión no permitida: {$extensionSubida}");
     }
 
-    $extension = $mimesPermitidos[$mime];
+    if (!in_array($mime, $mimesPorExtension[$extensionSubida])) {
+      throw new InvalidArgumentException("MIME no válido para extensión {$extensionSubida}: {$mime}");
+    }
+
+    $extension = $extensionSubida;
     $rutaRelativa = '';
     $rutaAbsoluta = '';
     do {

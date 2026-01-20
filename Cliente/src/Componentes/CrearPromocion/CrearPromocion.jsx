@@ -7,8 +7,8 @@ const ESTADOS_DISPONIBLES = [
   { value: "nuevo", label: "Nuevo" },
 ];
 
-const TIPOS_IMAGEN = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const TIPOS_ICONO = ["image/jpeg", "image/png", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon"];
+const TIPOS_IMAGEN = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
+const TIPOS_ICONO = ["image/jpeg", "image/jpg", "image/png", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon"];
 const TIPOS_IMAGEN_TEXTO = "JPG, PNG, WEBP o GIF";
 const TIPOS_ICONO_TEXTO = "JPG, PNG, SVG o ICO";
 

@@ -11,6 +11,7 @@ import ModalNuevoCupon from "./Componentes/ModalNuevoCupon";
 import CrearPromocion from "./Componentes/CrearPromocion/CrearPromocion";
 import { obtenerCupones, obtenerDestacados, obtenerCategorias, crearCupon, obtenerPromociones, crearPromocion } from "./services/solicitudes";
 import CrearPromocionPagina from "./Componentes/CrearPromocion/CrearPromocionPagina";
+import PaginaCupon from "./Componentes/paginas/PaginaCupon";
 const TEMA_STORAGE_KEY = "bombcoupons-tema";
 
 const obtenerTemaPreferido = () => {
@@ -150,8 +151,6 @@ function App() {
     }
   };
 
-  console.log(terminoBusqueda);
-
   return (
     <>
       <Routes>
@@ -200,7 +199,8 @@ function App() {
               />
             }
           />
-          <Route path="/promociones/crear" element={<CrearPromocionPagina onGuardar={manejarCrearPromocion} enProceso={false} />} />
+          <Route path="/cupon/unlocked/:id/v1_7k9M2xPq4WzL8nR5tYjBc6S3fG9hA1vD" element={<PaginaCupon data={promociones} />} />
+          <Route path="/promociones/550e8400-e29b-41d4-a716-446655440000" element={<CrearPromocionPagina onGuardar={manejarCrearPromocion} enProceso={false} />} />
           <Route path="/categorias" element={<PaginaCategorias categorias={categorias} cargando={estadoCarga.cargando} error={estadoCarga.error} />} />
           <Route path="*" element={<PaginaNoEncontrada />} />
         </Route>

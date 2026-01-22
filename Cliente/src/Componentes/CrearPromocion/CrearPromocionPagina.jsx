@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FiImage, FiUpload, FiArrowLeft } from "react-icons/fi";
 import { useNavigate } from "react-router-dom"; // Importante para la navegación
 
@@ -20,6 +20,8 @@ const inicialFormulario = {
   cupones: "1",
   estado: ESTADOS_DISPONIBLES[0].value,
   rating: "4.5",
+  coupon_code: "",
+  fecha_creacion: new Date().toISOString().split("T")[0], // formato YYYY-MM-DD para input type="date"
 };
 
 const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
@@ -55,6 +57,20 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
     const rating = Number(formulario.rating);
     if (Number.isNaN(rating) || rating < 0 || rating > 5) {
       nuevosErrores.rating = "El rating debe estar entre 0 y 5.";
+    }
+
+    if (formulario.coupon_code && formulario.coupon_code.length > 1000) {
+      nuevosErrores.coupon_code = "Máximo 1000 caracteres.";
+    }
+
+    // Validar fecha_creacion (debe ser una fecha válida YYYY-MM-DD)
+    if (!formulario.fecha_creacion) {
+      nuevosErrores.fecha_creacion = "Selecciona la fecha de creación.";
+    } else {
+      const ts = Date.parse(formulario.fecha_creacion);
+      if (Number.isNaN(ts)) {
+        nuevosErrores.fecha_creacion = "Fecha inválida.";
+      }
     }
 
     if (!archivos.imagen) {
@@ -175,6 +191,22 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
                     placeholder="Ej. Semana Gamer"
                   />
                   {errores.nombre && <div className="invalid-feedback">{errores.nombre}</div>}
+
+                  <div className="mt-3">
+                    <label className="form-label fw-semibold" htmlFor="coupon-code-promocion">
+                      Código del cupón
+                    </label>
+                    <input
+                      id="coupon-code-promocion"
+                      type="text"
+                      maxLength={255}
+                      className={`form-control ${errores.coupon_code ? "is-invalid" : ""}`}
+                      value={formulario.coupon_code}
+                      onChange={(e) => actualizarCampo("coupon_code", e.target.value)}
+                      placeholder="Ej. DESC2026"
+                    />
+                    {errores.coupon_code && <div className="invalid-feedback">{errores.coupon_code}</div>}
+                  </div>
                 </div>
 
                 <div className="col-12">
@@ -192,7 +224,7 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
                   {errores.detalles && <div className="invalid-feedback">{errores.detalles}</div>}
                 </div>
 
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <label className="form-label fw-semibold" htmlFor="cupones-promocion">
                     Cupones activos
                   </label>
@@ -206,7 +238,21 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
                   {errores.cupones && <div className="invalid-feedback">{errores.cupones}</div>}
                 </div>
 
-                <div className="col-md-4">
+                <div className="col-md-3">
+                  <label className="form-label fw-semibold" htmlFor="fecha-creacion-promocion">
+                    Fecha de creación
+                  </label>
+                  <input
+                    id="fecha-creacion-promocion"
+                    type="date"
+                    className={`form-control ${errores.fecha_creacion ? "is-invalid" : ""}`}
+                    value={formulario.fecha_creacion}
+                    onChange={(e) => actualizarCampo("fecha_creacion", e.target.value)}
+                  />
+                  {errores.fecha_creacion && <div className="invalid-feedback">{errores.fecha_creacion}</div>}
+                </div>
+
+                <div className="col-md-3">
                   <label className="form-label fw-semibold" htmlFor="estado-promocion">
                     Estado
                   </label>
@@ -219,7 +265,7 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
                   </select>
                 </div>
 
-                <div className="col-md-4">
+                <div className="col-md-3">
                   <label className="form-label fw-semibold" htmlFor="rating-promocion">
                     Rating
                   </label>

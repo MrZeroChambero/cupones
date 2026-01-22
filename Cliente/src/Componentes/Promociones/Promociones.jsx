@@ -49,11 +49,6 @@ const Promociones = ({ promociones = [], onCrearPromocion }) => {
           <span className="badge text-bg-dark-subtle d-inline-flex align-items-center gap-2">
             <FiTrendingUp aria-hidden="true" /> {items.length} activas
           </span>
-
-          <button type="button" className="btn btn-outline-accent btn-sm" onClick={onCrearPromocion}>
-            Nueva promoción
-          </button>
-
           <button type="button" className="btn btn-outline-accent btn-sm" onClick={() => navigate("/cupones")}>
             Ver todos
           </button>

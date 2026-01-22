@@ -27,7 +27,7 @@ const ModalCodigoCupon = ({ cupon, visible, onCerrar }) => {
     // Simular espera de 30 segundos
     setTimeout(() => {
       setFase("verificado");
-    }, 30000);
+    }, 600);
   };
 
   if (!visible || !cupon) return null;
@@ -118,7 +118,7 @@ const ModalCodigoCupon = ({ cupon, visible, onCerrar }) => {
                     <FiLock size={12} /> LOCKED
                   </span>
                 </div>
-                <div className="blurred-code-text">{cupon.codigo.substring(0, 6)}****</div>
+                <div className="blurred-code-text">{cupon.coupon_code}</div>
               </div>
 
               <button className="get-full-code-btn" onClick={() => window.open(cupon.link, "_blank")}>

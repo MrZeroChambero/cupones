@@ -16,9 +16,18 @@ class Promocion
     'image/gif' => 'gif',
   ];
 
+  // Ampliado para aceptar jpeg, webp, gif, bmp y variantes de svg/text/xml
   private const MIMES_ICONOS = [
     'image/png' => 'png',
+    'image/jpeg' => 'jpg',
+    'image/webp' => 'webp',
+    'image/gif' => 'gif',
+    'image/bmp' => 'bmp',
+    'image/x-ms-bmp' => 'bmp',
     'image/svg+xml' => 'svg',
+    'image/svg' => 'svg',
+    'text/xml' => 'svg',
+    'application/xml' => 'svg',
     'image/x-icon' => 'ico',
     'image/vnd.microsoft.icon' => 'ico',
   ];
@@ -36,6 +45,7 @@ class Promocion
     'img' => '',
     'icono' => '',
     'fecha_creacion' => '',
+    'coupon_code' => '',
   ];
 
   private string $directorioImagenes;
@@ -59,7 +69,7 @@ class Promocion
   public function listar(): void
   {
     try {
-      $sql = 'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, icono, fecha_creacion
+      $sql = 'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, icono, coupon_code, fecha_creacion
               FROM promociones
               ORDER BY fecha_creacion DESC, id_Promocion DESC';
       $registros = $this->conexion->consultar($sql);
@@ -108,7 +118,7 @@ class Promocion
       ]);
 
       $registro = $this->conexion->consultarUna(
-        'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, icono, fecha_creacion FROM promociones WHERE id_Promocion = :id',
+        'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, icono, coupon_code, fecha_creacion FROM promociones WHERE id_Promocion = :id',
         [':id' => $id]
       );
 
@@ -117,6 +127,7 @@ class Promocion
         'img' => $imagenGuardada['relativa'],
         'icono' => $iconoGuardado['relativa'],
         'fecha_creacion' => date('Y-m-d H:i:s'),
+        'coupon_code' => '',
       ]));
 
       RespuestaJson::exito(['promocion' => $promocion], 'Promoción creada correctamente.', 201);
@@ -151,6 +162,7 @@ class Promocion
       'detalles' => (string) ($registro['detalles'] ?? $this->atributos['detalles']),
       'img' => (string) ($registro['img'] ?? $this->atributos['img']),
       'icono' => (string) ($registro['icono'] ?? $this->atributos['icono']),
+      'coupon_code' => (string) ($registro['coupon_code'] ?? $this->atributos['coupon_code']),
       'fecha_creacion' => (string) ($registro['fecha_creacion'] ?? $this->atributos['fecha_creacion']),
     ];
   }
@@ -230,6 +242,15 @@ class Promocion
     }
 
     $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($archivo['tmp_name']) ?: '';
+
+    // Si finfo no reconoce svg u otros, intentar detectar por contenido (caso común con SVG)
+    if (!isset($mimesPermitidos[$mime])) {
+      $contenido = @file_get_contents($archivo['tmp_name']);
+      if ($contenido !== false && preg_match('/<svg[\s>/]/i', $contenido)) {
+        $mime = 'image/svg+xml';
+      }
+    }
+
     if (!isset($mimesPermitidos[$mime])) {
       throw new InvalidArgumentException("El archivo {$campo} no tiene un formato permitido.");
     }

@@ -39,7 +39,7 @@ const TarjetaCupon = ({ cupon, estaRevelado, onRevelar, modo = "completo" }) => 
       <div className="d-flex flex-column flex-md-row align-items-md-center">
         <button type="button" className="btn btn-revelar-orange btn-responsive-capsule fw-bold" onClick={() => onRevelar?.(cupon.id, cupon)}>
           <FiEye size={20} />
-          <span className="btn-text">{estaRevelado ? "Ver código otra vez" : "Ver código"}</span>
+          <span className="btn-text">{estaRevelado ? "Ver de nuevo" : "Ver código"}</span>
         </button>
       </div>
     </article>

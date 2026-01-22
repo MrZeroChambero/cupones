@@ -10,6 +10,7 @@ import ModalCodigoCupon from "./Componentes/ModalCodigoCupon";
 import ModalNuevoCupon from "./Componentes/ModalNuevoCupon";
 import CrearPromocion from "./Componentes/CrearPromocion/CrearPromocion";
 import { obtenerCupones, obtenerDestacados, obtenerCategorias, crearCupon, obtenerPromociones, crearPromocion } from "./services/solicitudes";
+import CrearPromocionPagina from "./Componentes/CrearPromocion/CrearPromocionPagina";
 const TEMA_STORAGE_KEY = "bombcoupons-tema";
 
 const obtenerTemaPreferido = () => {
@@ -184,6 +185,7 @@ function App() {
               />
             }
           />
+
           <Route
             path="/cupones"
             element={
@@ -198,6 +200,7 @@ function App() {
               />
             }
           />
+          <Route path="/promociones/crear" element={<CrearPromocionPagina onGuardar={manejarCrearPromocion} enProceso={false} />} />
           <Route path="/categorias" element={<PaginaCategorias categorias={categorias} cargando={estadoCarga.cargando} error={estadoCarga.error} />} />
           <Route path="*" element={<PaginaNoEncontrada />} />
         </Route>

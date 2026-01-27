@@ -91,12 +91,14 @@ class Promocion
 
       $imagenGuardada = $this->procesarArchivo(
         'imagen',
+        self::MIMES_IMAGENES,
         $this->directorioImagenes,
         '/img/'
       );
 
       $iconoGuardado = $this->procesarArchivo(
         'icono',
+        self::MIMES_ICONOS,
         $this->directorioIconos,
         '/icons/'
       );
@@ -220,7 +222,7 @@ class Promocion
     }
   }
 
-  private function procesarArchivo(string $campo, string $directorio, string $prefijo): array
+  private function procesarArchivo(string $campo, array $mimesPermitidos, string $directorio, string $prefijo): array
   {
     if (!isset($_FILES[$campo])) {
       throw new InvalidArgumentException("El archivo {$campo} es obligatorio.");
@@ -240,11 +242,20 @@ class Promocion
     }
 
     $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($archivo['tmp_name']) ?: '';
+
+    // Si finfo no reconoce svg u otros, intentar detectar por contenido (caso común con SVG)
+    if (!isset($mimesPermitidos[$mime])) {
+      $contenido = @file_get_contents($archivo['tmp_name']);
+      if ($contenido !== false && preg_match('/<svg[\s>/]/i', $contenido)) {
+        $mime = 'image/svg+xml';
+      }
+    }
+
     if (!isset($mimesPermitidos[$mime])) {
       throw new InvalidArgumentException("El archivo {$campo} no tiene un formato permitido.");
     }
 
-    $extension = $extensionSubida;
+    $extension = $mimesPermitidos[$mime];
     $rutaRelativa = '';
     $rutaAbsoluta = '';
     do {

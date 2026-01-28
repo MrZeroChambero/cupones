@@ -31,6 +31,7 @@ class Conexion
         PDO::ATTR_EMULATE_PREPARES => false,
       ]);
     } catch (PDOException $e) {
+      // En InfinityFree, a veces es útil ver el error real durante el setup
       RespuestaJson::error('Error de conexión a la base de datos.', 500, null, $e->getMessage());
       exit;
     }
@@ -76,17 +77,18 @@ class Conexion
 
     return [
       'driver' => $configuracion['driver'] ?? $env('DB_DRIVER', 'mysql'),
-      'host' => $configuracion['host'] ?? $env('DB_HOST', '127.0.0.1'),
+      // IMPORTANTE: Cambia 'sqlXXX.infinityfree.com' por el Hostname real de tu cPanel
+      'host' => $configuracion['host'] ?? $env('DB_HOST', 'sqlXXX.infinityfree.com'),
       'port' => $configuracion['port'] ?? $env('DB_PORT', '3306'),
       'database' => $configuracion['database']
         ?? $env('DB_NAME')
         ?? $env('DB_DATABASE')
-        ?? 'bombcoupons',
+        ?? 'if0_41009707_bombcoupons', // Tu BD de InfinityFree 
       'username' => $configuracion['username']
         ?? $env('DB_USER')
         ?? $env('DB_USERNAME')
-        ?? 'root',
-      'password' => $configuracion['password'] ?? $env('DB_PASSWORD', ''),
+        ?? 'if0_41009707', // Tu Usuario de InfinityFree 
+      'password' => $configuracion['password'] ?? $env('DB_PASSWORD', 'KCZg2d6uOz7bMq'), // Tu clave 
       'charset' => $configuracion['charset'] ?? $env('DB_CHARSET', 'utf8mb4'),
     ];
   }

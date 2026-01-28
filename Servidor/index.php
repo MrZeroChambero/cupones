@@ -7,8 +7,25 @@ use MkZero\Servidor\Respuesta\RespuestaJson;
 
 require __DIR__ . '/vendor/autoload.php';
 
+// Cargar variables de entorno desde .env
+$envFile = __DIR__ . '/.env';
+if (file_exists($envFile)) {
+  $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+  foreach ($lines as $line) {
+    $line = trim($line);
+    if (strpos($line, '#') === 0 || strpos($line, '=') === false) continue;
+    list($name, $value) = explode('=', $line, 2);
+    $name = trim($name);
+    $value = trim($value);
+    if (!isset($_ENV[$name])) {
+      $_ENV[$name] = $value;
+      putenv("$name=$value");
+    }
+  }
+}
+
 if (!defined('CLIENTE_PUBLIC_IMG_DIR')) {
-  $dirImagenes = __DIR__ . '/../Cliente/public/img';
+  $dirImagenes = __DIR__ . $_ENV['IMAGES_PATH'];
   if (!is_dir($dirImagenes)) {
     @mkdir($dirImagenes, 0775, true);
   }
@@ -16,7 +33,7 @@ if (!defined('CLIENTE_PUBLIC_IMG_DIR')) {
 }
 
 if (!defined('CLIENTE_PUBLIC_ICON_DIR')) {
-  $dirIconos = __DIR__ . '/../Cliente/public/icons';
+  $dirIconos = __DIR__ . $_ENV['ICONS_PATH'];
   if (!is_dir($dirIconos)) {
     @mkdir($dirIconos, 0775, true);
   }
@@ -89,7 +106,7 @@ if ($allowedOriginsConfigurados !== false && $allowedOriginsConfigurados !== nul
 }
 
 if (empty($allowedOrigins)) {
-  $frontUrl = $_ENV['FRONT_URL'] ?? getenv('FRONT_URL');
+  $frontUrl = $_ENV['ALLOWED_ORIGINS'] ?? getenv('FRONT_URL');
   if (!empty($frontUrl)) {
     $allowedOrigins[] = trim($frontUrl);
   }
@@ -97,8 +114,7 @@ if (empty($allowedOrigins)) {
 
 if (empty($allowedOrigins)) {
   $allowedOrigins = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
+    $_ENV['ALLOWED_ORIGINS'] ?? '',
   ];
 }
 

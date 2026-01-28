@@ -11,51 +11,23 @@ const obtenerEnv = (clave, predeterminado = "") => {
 };
 
 const host = limpiarHost(
-  obtenerEnv(
-    "VITE_BACKEND_HOST",
-    obtenerEnv("VITE_API_HOST", "http://localhost")
-  )
+  obtenerEnv("VITE_BACKEND_HOST", obtenerEnv("VITE_API_HOST"))
 );
-const puerto = obtenerEnv(
-  "VITE_BACKEND_PORT",
-  obtenerEnv("VITE_API_PORT", "80")
-);
-const basePath = limpiarPath(
-  obtenerEnv(
-    "VITE_BACKEND_PATH",
-    obtenerEnv("VITE_API_PATH", "/cupones/servidor")
-  )
-);
-const baseUrlEnv = obtenerEnv("VITE_API_BASE_URL", "").trim();
 
-const hostTienePuerto = /:\d+$/.test(host.replace(/^https?:\/\//i, ""));
-const puertoAplicado = puerto && !hostTienePuerto ? `:${puerto}` : "";
+const basePath = limpiarPath(
+  obtenerEnv("VITE_BACKEND_PATH", obtenerEnv("VITE_API_PATH"))
+);
+const baseUrlEnv = obtenerEnv("VITE_API_BASE_URL").trim();
+
+const puertoAplicado = "";
 const baseInferida = `${host}${puertoAplicado}${basePath}`;
 export const API_BASE_URL = (baseUrlEnv || baseInferida).replace(/\/$/, "");
 
-const endpointCupones = limpiarPath(
-  obtenerEnv(
-    "VITE_ENDPOINT_CUPONES",
-    obtenerEnv("VITE_API_ENDPOINT_CUPONES", "/cupones")
-  )
-);
-const endpointDestacados = limpiarPath(
-  obtenerEnv(
-    "VITE_ENDPOINT_DESTACADOS",
-    obtenerEnv("VITE_API_ENDPOINT_DESTACADOS", "/destacados")
-  )
-);
-const endpointCategorias = limpiarPath(
-  obtenerEnv(
-    "VITE_ENDPOINT_CATEGORIAS",
-    obtenerEnv("VITE_API_ENDPOINT_CATEGORIAS", "/categorias")
-  )
-);
+const endpointCupones = limpiarPath(obtenerEnv("VITE_ENDPOINT_CUPONES"));
+const endpointDestacados = limpiarPath(obtenerEnv("VITE_ENDPOINT_DESTACADOS"));
+const endpointCategorias = limpiarPath(obtenerEnv("VITE_ENDPOINT_CATEGORIAS"));
 const endpointPromociones = limpiarPath(
-  obtenerEnv(
-    "VITE_ENDPOINT_PROMOCIONES",
-    obtenerEnv("VITE_API_ENDPOINT_PROMOCIONES", "/promociones")
-  )
+  obtenerEnv("VITE_ENDPOINT_PROMOCIONES")
 );
 
 export const API_ENDPOINTS = {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 13-01-2026 a las 23:10:09
+-- Tiempo de generación: 28-01-2026 a las 02:44:57
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -41,10 +41,10 @@ CREATE TABLE `categorias` (
 --
 
 INSERT INTO `categorias` (`id`, `nombre`, `descripcion`, `slug`, `created_at`, `updated_at`) VALUES
-(1, 'Tecnología', 'Dispositivos inteligentes y periféricos', 'tecnologia', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(2, 'Moda', 'Colecciones urbanas y lifestyle', 'moda', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(3, 'Hogar', 'Decoración y soluciones eco', 'hogar', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(4, 'Gastronomía', 'Propuestas gourmet y delivery', 'gastronomia', '2026-01-10 00:37:55', '2026-01-10 00:37:55');
+(1, 'Tecnología', 'Dispositivos inteligentes y periféricos', 'tecnologia', '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(2, 'Moda', 'Colecciones urbanas y lifestyle', 'moda', '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(3, 'Hogar', 'Decoración y soluciones eco', 'hogar', '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(4, 'Gastronomía', 'Propuestas gourmet y delivery', 'gastronomia', '2026-01-14 01:54:03', '2026-01-14 01:54:03');
 
 -- --------------------------------------------------------
 
@@ -71,12 +71,11 @@ CREATE TABLE `cupones` (
 --
 
 INSERT INTO `cupones` (`id`, `marca`, `descripcion`, `codigo`, `categoria_id`, `expira`, `descuento`, `enlace`, `logo`, `created_at`, `updated_at`) VALUES
-(1, 'TechNova', '50% de descuento en accesorios inteligentes seleccionados.', 'TECHNOVA50', 1, '2026-02-15', '50%', 'https://tienda.technova.com/ofertas', 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=200&q=60', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(2, 'EcoMarket', 'Envío gratis y 15% off en productos sustentables.', 'ECOENVIO', 3, '2026-01-25', '15%', 'https://ecomarket.com/promos', 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=200&q=60', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(3, 'UrbanWear', '2x1 en sudaderas premium durante el fin de semana.', 'URBANX2', 2, '2026-01-20', '2x1', 'https://urbanwear.com/colecciones', 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=60', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(4, 'FreshBites', '30% menos en combos saludables listos para llevar.', 'FRESH30', 4, '2026-03-05', '30%', 'https://freshbites.com/ahorros', 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=60', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(5, 'FitPulse', 'Hasta 40% en membresías anuales premium.', 'FITPULSE40', 1, '2026-04-01', '40%', 'https://fitpulse.com/registros', 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=200&q=60', '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(7, 'fdsf', 'sdfdsffdsfdsfdsf', 'DSFDSF', 3, '2026-01-09', 'rwerwf', 'https://fsdfsd', 'http://localhost:8080/cupones/Servidor/uploads/logos/logo_55fffe4605e375dd.jpg', '2026-01-10 01:09:25', '2026-01-10 01:09:25');
+(1, 'TechNova', '50% de descuento en accesorios inteligentes seleccionados.', 'TECHNOVA50', 1, '2026-02-15', '50%', 'https://tienda.technova.com/ofertas', 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=200&q=60', '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(2, 'EcoMarket', 'Envío gratis y 15% off en productos sustentables.', 'ECOENVIO', 3, '2026-01-25', '15%', 'https://ecomarket.com/promos', 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=200&q=60', '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(3, 'UrbanWear', '2x1 en sudaderas premium durante el fin de semana.', 'URBANX2', 2, '2026-01-20', '2x1', 'https://urbanwear.com/colecciones', 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=60', '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(4, 'FreshBites', '30% menos en combos saludables listos para llevar.', 'FRESH30', 4, '2026-03-05', '30%', 'https://freshbites.com/ahorros', 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=200&q=60', '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(5, 'FitPulse', 'Hasta 40% en membresías anuales premium.', 'FITPULSE40', 1, '2026-04-01', '40%', 'https://fitpulse.com/registros', 'https://images.unsplash.com/photo-1558611848-73f7eb4001a1?auto=format&fit=crop&w=200&q=60', '2026-01-14 01:54:03', '2026-01-14 01:54:03');
 
 -- --------------------------------------------------------
 
@@ -102,8 +101,8 @@ CREATE TABLE `destacados` (
 --
 
 INSERT INTO `destacados` (`id`, `titulo`, `copy`, `codigo`, `descuento`, `expira`, `enlace`, `cupon_id`, `created_at`, `updated_at`) VALUES
-(1, 'Cuponazo del Mes', 'Aplica para laptops y monitores seleccionados.', 'MEGATECH', 'Hasta 60%', '2026-02-01', 'https://tienda.technova.com/ofertas', 1, '2026-01-10 00:37:55', '2026-01-10 00:37:55'),
-(2, 'Delivery Express', 'Comidas frescas en menos de 30 minutos.', 'EATEXPRESS', 'Envío gratis', '2026-01-30', 'https://freshbites.com/ahorros', 4, '2026-01-10 00:37:55', '2026-01-10 00:37:55');
+(1, 'Cuponazo del Mes', 'Aplica para laptops y monitores seleccionados.', 'MEGATECH', 'Hasta 60%', '2026-02-01', 'https://tienda.technova.com/ofertas', 1, '2026-01-14 01:54:03', '2026-01-14 01:54:03'),
+(2, 'Delivery Express', 'Comidas frescas en menos de 30 minutos.', 'EATEXPRESS', 'Envío gratis', '2026-01-30', 'https://freshbites.com/ahorros', 4, '2026-01-14 01:54:03', '2026-01-14 01:54:03');
 
 -- --------------------------------------------------------
 
@@ -116,6 +115,7 @@ CREATE TABLE `promociones` (
   `marca` varchar(255) NOT NULL,
   `nombre` varchar(255) NOT NULL,
   `cupones` int(11) NOT NULL,
+  `coupon_code` varchar(100) NOT NULL,
   `estado` enum('disponible','usado') NOT NULL DEFAULT 'disponible',
   `rating` decimal(3,1) NOT NULL,
   `detalles` varchar(255) NOT NULL,
@@ -123,6 +123,14 @@ CREATE TABLE `promociones` (
   `icono` varchar(255) NOT NULL,
   `fecha_creacion` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `promociones`
+--
+
+INSERT INTO `promociones` (`id_Promocion`, `marca`, `nombre`, `cupones`, `coupon_code`, `estado`, `rating`, `detalles`, `img`, `icono`, `fecha_creacion`) VALUES
+(5, 'AdHoc Studio', 'Hytale', 256, 'BOMBCPN7871612', 'disponible', 4.5, 'Hytale is a sandbox game by Hypixel Studios. Development began in 2015 by developers from the Minecraft multiplayer server Hypixel with funding from Riot Games. Riot would purchase the studio outright in 2020.', '/img/OgNH0gz285QLknkysED.png', '/icons/lHrV5Qvp4Mgq42JLvGtB.png', '2026-01-19 21:07:32'),
+(19, 'Electronic Arts', 'Battlefield 6', 232, 'T652A-78Q37-DZK0L', 'disponible', 5.0, '**SPONSORS REQUIRE 2 TO UNLOCK GAME CODE**\r\n\r\nThe ultimate all-out warfare experience. In a war of tanks, fighter jets, and massive combat arsenals, your squad is the deadliest weapon.', '/img/n65pGnkYAH9RfU8BxKtn.jpg', '/icons/N2rNg6x7HMzRn96.png', '2026-01-21 22:03:23');
 
 --
 -- Índices para tablas volcadas
@@ -169,7 +177,7 @@ ALTER TABLE `categorias`
 -- AUTO_INCREMENT de la tabla `cupones`
 --
 ALTER TABLE `cupones`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `destacados`
@@ -181,7 +189,7 @@ ALTER TABLE `destacados`
 -- AUTO_INCREMENT de la tabla `promociones`
 --
 ALTER TABLE `promociones`
-  MODIFY `id_Promocion` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_Promocion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- Restricciones para tablas volcadas

@@ -6,74 +6,47 @@ use InvalidArgumentException;
 use MkZero\Servidor\Conexion\Conexion;
 use MkZero\Servidor\Respuesta\RespuestaJson;
 use Throwable;
+use Valitron\Validator;
 
 class Promocion
 {
-  private const MIMES_IMAGENES = [
-    'image/jpeg' => 'jpg',
-    'image/png' => 'png',
-    'image/webp' => 'webp',
-    'image/gif' => 'gif',
+  private $conexion;
+
+  // Lista de atributos para formateo
+  private const ATRIBUTOS_FORMATEO = [
+    'id' => ['tipo' => 'int', 'default' => 0],
+    'marca' => ['tipo' => 'string', 'default' => ''],
+    'nombre' => ['tipo' => 'string', 'default' => ''],
+    'cupones' => ['tipo' => 'int', 'default' => 0],
+    'estado' => ['tipo' => 'string', 'default' => 'disponible'],
+    'rating' => ['tipo' => 'float', 'default' => 0.0],
+    'detalles' => ['tipo' => 'string', 'default' => ''],
+    'img' => ['tipo' => 'string', 'default' => ''],
+    'coupon_code' => ['tipo' => 'string', 'default' => ''],
+    'fecha_creacion' => ['tipo' => 'string', 'default' => ''],
   ];
 
-  // Ampliado para aceptar jpeg, webp, gif, bmp y variantes de svg/text/xml
-  private const MIMES_ICONOS = [
-    'image/png' => 'png',
-    'image/jpeg' => 'jpg',
-    'image/webp' => 'webp',
-    'image/gif' => 'gif',
-    'image/bmp' => 'bmp',
-    'image/x-ms-bmp' => 'bmp',
-    'image/svg+xml' => 'svg',
-    'image/svg' => 'svg',
-    'text/xml' => 'svg',
-    'application/xml' => 'svg',
-    'image/x-icon' => 'ico',
-    'image/vnd.microsoft.icon' => 'ico',
+  // Mapeo de nombres de campos de la BD
+  private const MAPEO_CAMPOS = [
+    'id_Promocion' => 'id',
+    'fecha_creacion' => 'fecha_creacion'
   ];
 
-  private const TAMANIO_MAX_ARCHIVO = 5_000_000; // 5MB
-
-  private array $atributos = [
-    'id' => 0,
-    'marca' => '',
-    'nombre' => '',
-    'cupones' => 0,
-    'estado' => 'disponible',
-    'rating' => 0.0,
-    'detalles' => '',
-    'img' => '',
-    'icono' => '',
-    'fecha_creacion' => '',
-    'coupon_code' => '',
-  ];
-
-  private string $directorioImagenes;
-  private string $directorioIconos;
-
-  public function __construct(private Conexion $conexion)
+  public function __construct(Conexion $conexion)
   {
-    $baseCliente = dirname(__DIR__, 2) . '/../Cliente/public';
-    $baseNormalizada = realpath($baseCliente) ?: $baseCliente;
-    $this->directorioImagenes = defined('CLIENTE_PUBLIC_IMG_DIR')
-      ? CLIENTE_PUBLIC_IMG_DIR
-      : $baseNormalizada . '/img';
-    $this->directorioIconos = defined('CLIENTE_PUBLIC_ICON_DIR')
-      ? CLIENTE_PUBLIC_ICON_DIR
-      : $baseNormalizada . '/icons';
-
-    $this->asegurarDirectorio($this->directorioImagenes);
-    $this->asegurarDirectorio($this->directorioIconos);
+    $this->conexion = $conexion;
   }
 
   public function listar(): void
   {
     try {
-      $sql = 'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, icono, coupon_code, fecha_creacion
-              FROM promociones
-              ORDER BY fecha_creacion DESC, id_Promocion DESC';
+      $sql = 'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, coupon_code, fecha_creacion
+                    FROM promociones
+                    ORDER BY fecha_creacion DESC, id_Promocion DESC';
+
       $registros = $this->conexion->consultar($sql);
-      $promociones = array_map([$this, 'formatear'], $registros);
+      $promociones = array_map([$this, 'formatearDatos'], $registros);
+
       RespuestaJson::exito(['promociones' => $promociones], 'Promociones disponibles.');
     } catch (Throwable $e) {
       RespuestaJson::error('No se pudieron listar las promociones.', 500, null, $e->getMessage());
@@ -82,29 +55,12 @@ class Promocion
 
   public function crear(): void
   {
-    $imagenGuardada = null;
-    $iconoGuardado = null;
-
     try {
       $datos = $this->sanitizarDatos($_POST ?? []);
       $this->validarDatos($datos);
 
-      $imagenGuardada = $this->procesarArchivo(
-        'imagen',
-        self::MIMES_IMAGENES,
-        $this->directorioImagenes,
-        '/img/'
-      );
-
-      $iconoGuardado = $this->procesarArchivo(
-        'icono',
-        self::MIMES_ICONOS,
-        $this->directorioIconos,
-        '/icons/'
-      );
-
-      $sql = 'INSERT INTO promociones (marca, nombre, cupones, estado, rating, detalles, img, icono)
-              VALUES (:marca, :nombre, :cupones, :estado, :rating, :detalles, :img, :icono)';
+      $sql = 'INSERT INTO promociones (marca, nombre, cupones, estado, rating, detalles, img)
+                    VALUES (:marca, :nombre, :cupones, :estado, :rating, :detalles, :img)';
 
       $id = $this->conexion->insertar($sql, [
         ':marca' => $datos['marca'],
@@ -113,191 +69,151 @@ class Promocion
         ':estado' => $datos['estado'],
         ':rating' => $datos['rating'],
         ':detalles' => $datos['detalles'],
-        ':img' => $imagenGuardada['relativa'],
-        ':icono' => $iconoGuardado['relativa'],
+        ':img' => $datos['img'],
       ]);
 
       $registro = $this->conexion->consultarUna(
-        'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, icono, coupon_code, fecha_creacion FROM promociones WHERE id_Promocion = :id',
+        'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, coupon_code, fecha_creacion 
+                 FROM promociones 
+                 WHERE id_Promocion = :id',
         [':id' => $id]
       );
 
-      $promocion = $this->formatear($registro ?: array_merge($datos, [
+      $promocion = $this->formatearDatos($registro ?: array_merge($datos, [
         'id_Promocion' => $id,
-        'img' => $imagenGuardada['relativa'],
-        'icono' => $iconoGuardado['relativa'],
-        'fecha_creacion' => date('Y-m-d H:i:s'),
         'coupon_code' => '',
+        'fecha_creacion' => date('Y-m-d H:i:s'),
       ]));
 
       RespuestaJson::exito(['promocion' => $promocion], 'Promoción creada correctamente.', 201);
     } catch (InvalidArgumentException $e) {
-      if ($imagenGuardada) {
-        $this->eliminarArchivo($imagenGuardada['absoluta']);
-      }
-      if ($iconoGuardado) {
-        $this->eliminarArchivo($iconoGuardado['absoluta']);
-      }
       RespuestaJson::error($e->getMessage(), 422);
     } catch (Throwable $e) {
-      if ($imagenGuardada) {
-        $this->eliminarArchivo($imagenGuardada['absoluta']);
-      }
-      if ($iconoGuardado) {
-        $this->eliminarArchivo($iconoGuardado['absoluta']);
-      }
       RespuestaJson::error('No se pudo crear la promoción.', 500, null, $e->getMessage());
     }
   }
 
-  private function formatear(array $registro): array
+  /**
+   * Método único para formatear datos de promoción
+   * @param array $datos Datos de entrada
+   * @return array Datos formateados
+   */
+  public function formatearDatos(array $datos): array
   {
-    return [
-      'id' => (int) ($registro['id_Promocion'] ?? $registro['id'] ?? $this->atributos['id']),
-      'marca' => (string) ($registro['marca'] ?? $this->atributos['marca']),
-      'nombre' => (string) ($registro['nombre'] ?? $this->atributos['nombre']),
-      'cupones' => (int) ($registro['cupones'] ?? $this->atributos['cupones']),
-      'estado' => (string) ($registro['estado'] ?? $this->atributos['estado']),
-      'rating' => (float) ($registro['rating'] ?? $this->atributos['rating']),
-      'detalles' => (string) ($registro['detalles'] ?? $this->atributos['detalles']),
-      'img' => (string) ($registro['img'] ?? $this->atributos['img']),
-      'icono' => (string) ($registro['icono'] ?? $this->atributos['icono']),
-      'coupon_code' => (string) ($registro['coupon_code'] ?? $this->atributos['coupon_code']),
-      'fecha_creacion' => (string) ($registro['fecha_creacion'] ?? $this->atributos['fecha_creacion']),
-    ];
+    $formateados = [];
+
+    foreach (self::ATRIBUTOS_FORMATEO as $campo => $config) {
+      // Buscar el valor en diferentes nombres posibles
+      $valor = $this->obtenerValorCampo($datos, $campo, $config['default']);
+
+      // Aplicar tipo de dato
+      $formateados[$campo] = $this->aplicarTipo($valor, $config['tipo']);
+    }
+
+    return $formateados;
+  }
+
+  /**
+   * Busca el valor de un campo en diferentes nombres posibles
+   */
+  private function obtenerValorCampo(array $datos, string $campoDestino, $default)
+  {
+    // Primero buscar por nombre directo
+    if (array_key_exists($campoDestino, $datos)) {
+      return $datos[$campoDestino];
+    }
+
+    // Buscar en el mapeo de campos de BD
+    foreach (self::MAPEO_CAMPOS as $campoBD => $campoFormateado) {
+      if ($campoFormateado === $campoDestino && array_key_exists($campoBD, $datos)) {
+        return $datos[$campoBD];
+      }
+    }
+
+    return $default;
+  }
+
+  /**
+   * Aplica el tipo de dato especificado
+   */
+  private function aplicarTipo($valor, string $tipo)
+  {
+    switch ($tipo) {
+      case 'int':
+        return (int) $valor;
+      case 'float':
+        return round((float) $valor, 1);
+      case 'string':
+        return (string) $valor;
+      default:
+        return $valor;
+    }
   }
 
   private function sanitizarDatos(array $input): array
   {
-    $estado = trim((string)($input['estado'] ?? 'disponible'));
-    $estado = $estado === '' ? 'disponible' : mb_substr($estado, 0, 60);
-
     return [
       'marca' => trim((string)($input['marca'] ?? '')),
       'nombre' => trim((string)($input['nombre'] ?? '')),
       'detalles' => trim((string)($input['detalles'] ?? '')),
       'cupones' => (string)($input['cupones'] ?? ''),
-      'estado' => $estado,
+      'estado' => trim((string)($input['estado'] ?? 'disponible')),
       'rating' => (string)($input['rating'] ?? ''),
+      'img' => trim((string)($input['img'] ?? '')),
     ];
   }
 
   private function validarDatos(array &$datos): void
   {
-    $requeridos = ['marca', 'nombre', 'detalles'];
-    foreach ($requeridos as $campo) {
-      if ($datos[$campo] === '') {
-        throw new InvalidArgumentException("El campo {$campo} es obligatorio.");
+    $v = new Validator($datos);
+
+    // Reglas de validación con Valitron
+    $v->rule('required', ['marca', 'nombre', 'detalles', 'img'])
+      ->message('{field} es obligatorio');
+
+    $v->rule('lengthMax', 'marca', 120)
+      ->message('Marca no puede exceder 120 caracteres');
+
+    $v->rule('lengthMax', 'nombre', 150)
+      ->message('Nombre no puede exceder 150 caracteres');
+
+    $v->rule('lengthMax', 'detalles', 255)
+      ->message('Detalles no puede exceder 255 caracteres');
+
+    $v->rule('lengthMax', 'estado', 60)
+      ->message('Estado no puede exceder 60 caracteres');
+
+    $v->rule('integer', 'cupones')
+      ->message('Cupones debe ser un número entero');
+
+    $v->rule('min', 'cupones', 1)
+      ->message('Cupones debe ser al menos 1');
+
+    $v->rule('max', 'cupones', 9999)
+      ->message('Cupones no puede exceder 9999');
+
+    $v->rule('numeric', 'rating')
+      ->message('Rating debe ser numérico');
+
+    $v->rule('min', 'rating', 0)
+      ->message('Rating debe ser al menos 0');
+
+    $v->rule('max', 'rating', 5)
+      ->message('Rating no puede exceder 5');
+
+    $v->rule('url', 'img')
+      ->message('Imagen debe ser una URL válida');
+
+    if (!$v->validate()) {
+      $errores = [];
+      foreach ($v->errors() as $campoErrores) {
+        $errores[] = $campoErrores[0];
       }
+      throw new InvalidArgumentException(implode(' ', $errores));
     }
 
-    $this->validarLongitud($datos['marca'], 120, 'marca');
-    $this->validarLongitud($datos['nombre'], 150, 'nombre');
-    $this->validarLongitud($datos['detalles'], 255, 'detalles');
-    $this->validarLongitud($datos['estado'], 60, 'estado');
-
-    $cupones = filter_var($datos['cupones'], FILTER_VALIDATE_INT, [
-      'options' => ['min_range' => 1, 'max_range' => 9999],
-    ]);
-    if ($cupones === false) {
-      throw new InvalidArgumentException('El campo cupones debe ser un número positivo.');
-    }
-
-    $rating = filter_var($datos['rating'], FILTER_VALIDATE_FLOAT);
-    if ($rating === false) {
-      throw new InvalidArgumentException('El campo rating debe ser numérico.');
-    }
-    if ($rating < 0 || $rating > 5) {
-      throw new InvalidArgumentException('El rating debe estar entre 0 y 5.');
-    }
-
-    $datos['cupones'] = (int) $cupones;
-    $datos['rating'] = round((float) $rating, 1);
-  }
-
-  private function validarLongitud(string $valor, int $maximo, string $campo): void
-  {
-    if (mb_strlen($valor) > $maximo) {
-      throw new InvalidArgumentException("El campo {$campo} supera el máximo de {$maximo} caracteres.");
-    }
-  }
-
-  private function procesarArchivo(string $campo, array $mimesPermitidos, string $directorio, string $prefijo): array
-  {
-    if (!isset($_FILES[$campo])) {
-      throw new InvalidArgumentException("El archivo {$campo} es obligatorio.");
-    }
-
-    $archivo = $_FILES[$campo];
-    if (!is_array($archivo) || ($archivo['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
-      throw new InvalidArgumentException("No se pudo recibir el archivo {$campo}.");
-    }
-
-    if (!is_uploaded_file($archivo['tmp_name'])) {
-      throw new InvalidArgumentException("El archivo {$campo} no es válido.");
-    }
-
-    if (($archivo['size'] ?? 0) > self::TAMANIO_MAX_ARCHIVO) {
-      throw new InvalidArgumentException("El archivo {$campo} supera el tamaño permitido de 5MB.");
-    }
-
-    $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($archivo['tmp_name']) ?: '';
-
-    // Si finfo no reconoce svg u otros, intentar detectar por contenido (caso común con SVG)
-    if (!isset($mimesPermitidos[$mime])) {
-      $contenido = @file_get_contents($archivo['tmp_name']);
-      if ($contenido !== false && preg_match('/<svg[\s>/]/i', $contenido)) {
-        $mime = 'image/svg+xml';
-      }
-    }
-
-    if (!isset($mimesPermitidos[$mime])) {
-      throw new InvalidArgumentException("El archivo {$campo} no tiene un formato permitido.");
-    }
-
-    $extension = $mimesPermitidos[$mime];
-    $rutaRelativa = '';
-    $rutaAbsoluta = '';
-    do {
-      $nombreAleatorio = $this->generarNombreAleatorio();
-      $nombreArchivo = $nombreAleatorio . '.' . $extension;
-      $rutaRelativa = $prefijo . $nombreArchivo;
-      $rutaAbsoluta = rtrim($directorio, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $nombreArchivo;
-    } while (file_exists($rutaAbsoluta));
-
-    if (!move_uploaded_file($archivo['tmp_name'], $rutaAbsoluta)) {
-      throw new InvalidArgumentException("No se pudo guardar el archivo {$campo}.");
-    }
-
-    return [
-      'relativa' => $rutaRelativa,
-      'absoluta' => $rutaAbsoluta,
-    ];
-  }
-
-  private function generarNombreAleatorio(int $min = 10, int $max = 20): string
-  {
-    $longitud = random_int($min, $max);
-    $caracteres = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    $resultado = '';
-    $caracteresMax = strlen($caracteres) - 1;
-    for ($i = 0; $i < $longitud; $i++) {
-      $resultado .= $caracteres[random_int(0, $caracteresMax)];
-    }
-    return $resultado;
-  }
-
-  private function asegurarDirectorio(string $ruta): void
-  {
-    if (!is_dir($ruta) && !mkdir($ruta, 0775, true) && !is_dir($ruta)) {
-      throw new InvalidArgumentException('No se pudo preparar el directorio para subir archivos.');
-    }
-  }
-
-  private function eliminarArchivo(?string $ruta): void
-  {
-    if ($ruta && file_exists($ruta)) {
-      @unlink($ruta);
-    }
+    // Convertir tipos después de validar
+    $datos['cupones'] = (int) $datos['cupones'];
+    $datos['rating'] = round((float) $datos['rating'], 1);
   }
 }

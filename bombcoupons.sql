@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 28-01-2026 a las 02:44:57
+-- Tiempo de generación: 03-02-2026 a las 01:18:27
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -120,7 +120,6 @@ CREATE TABLE `promociones` (
   `rating` decimal(3,1) NOT NULL,
   `detalles` varchar(255) NOT NULL,
   `img` varchar(255) NOT NULL,
-  `icono` varchar(255) NOT NULL,
   `fecha_creacion` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -128,9 +127,12 @@ CREATE TABLE `promociones` (
 -- Volcado de datos para la tabla `promociones`
 --
 
-INSERT INTO `promociones` (`id_Promocion`, `marca`, `nombre`, `cupones`, `coupon_code`, `estado`, `rating`, `detalles`, `img`, `icono`, `fecha_creacion`) VALUES
-(5, 'AdHoc Studio', 'Hytale', 256, 'BOMBCPN7871612', 'disponible', 4.5, 'Hytale is a sandbox game by Hypixel Studios. Development began in 2015 by developers from the Minecraft multiplayer server Hypixel with funding from Riot Games. Riot would purchase the studio outright in 2020.', '/img/OgNH0gz285QLknkysED.png', '/icons/lHrV5Qvp4Mgq42JLvGtB.png', '2026-01-19 21:07:32'),
-(19, 'Electronic Arts', 'Battlefield 6', 232, 'T652A-78Q37-DZK0L', 'disponible', 5.0, '**SPONSORS REQUIRE 2 TO UNLOCK GAME CODE**\r\n\r\nThe ultimate all-out warfare experience. In a war of tanks, fighter jets, and massive combat arsenals, your squad is the deadliest weapon.', '/img/n65pGnkYAH9RfU8BxKtn.jpg', '/icons/N2rNg6x7HMzRn96.png', '2026-01-21 22:03:23');
+INSERT INTO `promociones` (`id_Promocion`, `marca`, `nombre`, `cupones`, `coupon_code`, `estado`, `rating`, `detalles`, `img`, `fecha_creacion`) VALUES
+(5, 'AdHoc Studio', 'Hytale', 256, 'BOMBCPN7871612', 'disponible', 4.5, 'Hytale is a sandbox game by Hypixel Studios. Development began in 2015 by developers from the Minecraft multiplayer server Hypixel with funding from Riot Games. Riot would purchase the studio outright in 2020.', '/img/OgNH0gz285QLknkysED.png', '2026-01-19 21:07:32'),
+(19, 'Electronic Arts', 'Battlefield 6', 232, 'T652A-78Q37-DZK0L', 'disponible', 5.0, '**SPONSORS REQUIRE 2 TO UNLOCK GAME CODE**\r\n\r\nThe ultimate all-out warfare experience. In a war of tanks, fighter jets, and massive combat arsenals, your squad is the deadliest weapon.', 'https://i.pinimg.com/736x/9f/5d/3f/9f5d3f85d2817d6ed40fdddfddcc5662.jpg', '2026-01-21 22:03:23'),
+(23, 'sdsa', 'sadsad', 1, '', 'disponible', 4.5, 'asdsadas', 'dsadsa', '0000-00-00 00:00:00'),
+(24, 'joder', 'xd', 1, '', 'disponible', 4.5, 'qweqweqw', 'wqeqweqw', '0000-00-00 00:00:00'),
+(25, 'jjjj', 'jjjj', 1, '', 'disponible', 4.5, 'jjjj', 'https://i.pinimg.com/736x/05/33/1b/05331bd2869333cb2a5b9806687fb6fd.jpg', '0000-00-00 00:00:00');
 
 --
 -- Índices para tablas volcadas
@@ -189,7 +191,7 @@ ALTER TABLE `destacados`
 -- AUTO_INCREMENT de la tabla `promociones`
 --
 ALTER TABLE `promociones`
-  MODIFY `id_Promocion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id_Promocion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- Restricciones para tablas volcadas

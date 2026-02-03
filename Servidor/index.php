@@ -124,8 +124,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 }
 
 $router = new AltoRouter();
-$basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
-$router->setBasePath($basePath === '' ? '/' : $basePath);
+if ($_ENV['DOCKER'] === true) {
+  $router->setBasePath('');
+} else {
+  $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');
+  $router->setBasePath($basePath === '' ? '/' : $basePath);
+}
+
 
 // Definición de rutas principales de la API en un solo archivo
 $registrar = require __DIR__ . '/src/Endpoints.php';
@@ -137,6 +142,10 @@ if ($coincidencia && is_callable($coincidencia['target'])) {
   call_user_func_array($coincidencia['target'], $coincidencia['params']);
   return;
 }
+$routasUsadas = $router->getRoutes();
+foreach ($routasUsadas as $rutasparaver) {
+  $routasListadas[] = $rutasparaver[0] . ' ' . $rutasparaver[1];
+}
 
 $rutaSolicitada = $_SERVER['REQUEST_URI'] ?? '';
-RespuestaJson::error("No existe la ruta '{$rutaSolicitada}'", 404);
+RespuestaJson::error("No existe la ruta '{$rutaSolicitada}', las rutas disponibles son: " . print_r($routasListadas, true), 404);

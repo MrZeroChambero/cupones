@@ -1,4 +1,9 @@
+Options -Indexes
 RewriteEngine On
+
+# Si el archivo existe (ej. una imagen o CSS), que lo cargue normal
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+
+# Si no existe (ej. /cupones), que todo pase por index.php
+RewriteRule ^ index.php [L]

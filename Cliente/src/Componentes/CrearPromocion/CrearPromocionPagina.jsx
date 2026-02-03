@@ -8,17 +8,13 @@ const ESTADOS_DISPONIBLES = [
   { value: "nuevo", label: "Nuevo" },
 ];
 
-const TIPOS_IMAGEN = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"];
-const TIPOS_ICONO = ["image/jpeg", "image/jpg", "image/png", "image/svg+xml", "image/x-icon", "image/vnd.microsoft.icon"];
-const TIPOS_IMAGEN_TEXTO = "JPG, PNG, WEBP o GIF";
-const TIPOS_ICONO_TEXTO = "JPG, PNG, SVG o ICO";
-
 const inicialFormulario = {
   marca: "",
   nombre: "",
   detalles: "",
   cupones: "1",
   estado: ESTADOS_DISPONIBLES[0].value,
+  img: "",
   rating: "4.5",
   coupon_code: "",
   fecha_creacion: new Date().toISOString().split("T")[0], // formato YYYY-MM-DD para input type="date"
@@ -27,17 +23,13 @@ const inicialFormulario = {
 const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
   const navigate = useNavigate();
   const [formulario, setFormulario] = useState(inicialFormulario);
-  const [archivos, setArchivos] = useState({ imagen: null, icono: null });
+
   const [errores, setErrores] = useState({});
   const [mensajeGeneral, setMensajeGeneral] = useState("");
+  const [mostrarModalExito, setMostrarModalExito] = useState(false);
 
   const actualizarCampo = (campo, valor) => {
     setFormulario((prev) => ({ ...prev, [campo]: valor }));
-  };
-
-  const actualizarArchivo = (campo, archivosEntrada) => {
-    const archivo = archivosEntrada?.[0] ?? null;
-    setArchivos((prev) => ({ ...prev, [campo]: archivo }));
   };
 
   const validar = () => {
@@ -73,17 +65,6 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
       }
     }
 
-    if (!archivos.imagen) {
-      nuevosErrores.imagen = "Selecciona una imagen principal.";
-    } else if (!TIPOS_IMAGEN.includes(archivos.imagen.type)) {
-      nuevosErrores.imagen = "Formato de imagen no permitido.";
-    }
-
-    if (!archivos.icono) {
-      nuevosErrores.icono = "Selecciona un icono.";
-    } else if (!TIPOS_ICONO.includes(archivos.icono.type)) {
-      nuevosErrores.icono = "Formato de icono no permitido.";
-    }
 
     return nuevosErrores;
   };
@@ -103,40 +84,16 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
     Object.entries(formulario).forEach(([clave, valor]) => {
       payload.append(clave, valor);
     });
-    payload.append("imagen", archivos.imagen);
-    payload.append("icono", archivos.icono);
 
     try {
       await onGuardar?.(payload);
       // Opcional: navegar a la lista después de guardar con éxito
       // navigate("/promociones");
+      setMostrarModalExito(true);
     } catch (error) {
       const mensaje = error?.message ?? "No se pudo guardar la promoción.";
       setMensajeGeneral(mensaje);
     }
-  };
-
-  const renderInputArchivo = (campo, etiqueta, tiposLegibles, descripcion) => {
-    const archivoSeleccionado = archivos[campo];
-    return (
-      <div className="mb-3">
-        <label className="form-label fw-semibold">{etiqueta}</label>
-        <div className={`upload-dropzone ${errores[campo] ? "is-invalid" : ""}`}>
-          <FiImage aria-hidden="true" />
-          <div>
-            <p className="mb-0 fw-semibold">{archivoSeleccionado ? archivoSeleccionado.name : "Selecciona un archivo"}</p>
-            <p className="text-body-secondary small mb-0">{descripcion}</p>
-          </div>
-          <label className="btn btn-outline-accent btn-sm mb-0">
-            <span className="d-inline-flex align-items-center gap-2">
-              <FiUpload aria-hidden="true" /> Subir
-            </span>
-            <input type="file" accept={tiposLegibles} className="d-none" onChange={(e) => actualizarArchivo(campo, e.target.files)} />
-          </label>
-        </div>
-        {errores[campo] && <div className="invalid-feedback d-block">{errores[campo]}</div>}
-      </div>
-    );
   };
 
   return (
@@ -145,7 +102,12 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
         <div className="col-lg-10">
           {/* Cabecera de la página */}
           <div className="d-flex align-items-center gap-3 mb-4">
-            <button type="button" className="btn btn-outline-secondary btn-sm rounded-circle" onClick={() => navigate(-1)} title="Volver">
+            <button
+              type="button"
+              className="btn btn-outline-secondary btn-sm rounded-circle"
+              onClick={() => navigate(-1)}
+              title="Volver"
+            >
               <FiArrowLeft size={18} />
             </button>
             <div>
@@ -164,99 +126,159 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
 
               <div className="row g-4">
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold" htmlFor="marca-promocion">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="marca-promocion"
+                  >
                     Marca
                   </label>
                   <input
                     id="marca-promocion"
                     type="text"
-                    className={`form-control ${errores.marca ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errores.marca ? "is-invalid" : ""
+                    }`}
                     value={formulario.marca}
                     onChange={(e) => actualizarCampo("marca", e.target.value)}
                     placeholder="Ej. ShopiTech"
                   />
-                  {errores.marca && <div className="invalid-feedback">{errores.marca}</div>}
+                  {errores.marca && (
+                    <div className="invalid-feedback">{errores.marca}</div>
+                  )}
                 </div>
 
                 <div className="col-md-6">
-                  <label className="form-label fw-semibold" htmlFor="nombre-promocion">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="nombre-promocion"
+                  >
                     Nombre comercial
                   </label>
                   <input
                     id="nombre-promocion"
                     type="text"
-                    className={`form-control ${errores.nombre ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errores.nombre ? "is-invalid" : ""
+                    }`}
                     value={formulario.nombre}
                     onChange={(e) => actualizarCampo("nombre", e.target.value)}
                     placeholder="Ej. Semana Gamer"
                   />
-                  {errores.nombre && <div className="invalid-feedback">{errores.nombre}</div>}
+                  {errores.nombre && (
+                    <div className="invalid-feedback">{errores.nombre}</div>
+                  )}
 
                   <div className="mt-3">
-                    <label className="form-label fw-semibold" htmlFor="coupon-code-promocion">
+                    <label
+                      className="form-label fw-semibold"
+                      htmlFor="coupon-code-promocion"
+                    >
                       Código del cupón
                     </label>
                     <input
                       id="coupon-code-promocion"
                       type="text"
                       maxLength={255}
-                      className={`form-control ${errores.coupon_code ? "is-invalid" : ""}`}
+                      className={`form-control ${
+                        errores.coupon_code ? "is-invalid" : ""
+                      }`}
                       value={formulario.coupon_code}
-                      onChange={(e) => actualizarCampo("coupon_code", e.target.value)}
+                      onChange={(e) =>
+                        actualizarCampo("coupon_code", e.target.value)
+                      }
                       placeholder="Ej. DESC2026"
                     />
-                    {errores.coupon_code && <div className="invalid-feedback">{errores.coupon_code}</div>}
+                    {errores.coupon_code && (
+                      <div className="invalid-feedback">
+                        {errores.coupon_code}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="col-12">
-                  <label className="form-label fw-semibold" htmlFor="detalles-promocion">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="detalles-promocion"
+                  >
                     Detalles
                   </label>
                   <textarea
                     id="detalles-promocion"
-                    className={`form-control ${errores.detalles ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errores.detalles ? "is-invalid" : ""
+                    }`}
                     rows={4}
                     value={formulario.detalles}
-                    onChange={(e) => actualizarCampo("detalles", e.target.value)}
+                    onChange={(e) =>
+                      actualizarCampo("detalles", e.target.value)
+                    }
                     placeholder="Describe los beneficios principales de la promoción..."
                   />
-                  {errores.detalles && <div className="invalid-feedback">{errores.detalles}</div>}
+                  {errores.detalles && (
+                    <div className="invalid-feedback">{errores.detalles}</div>
+                  )}
                 </div>
 
                 <div className="col-md-3">
-                  <label className="form-label fw-semibold" htmlFor="cupones-promocion">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="cupones-promocion"
+                  >
                     Cupones activos
                   </label>
                   <input
                     id="cupones-promocion"
                     type="number"
-                    className={`form-control ${errores.cupones ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errores.cupones ? "is-invalid" : ""
+                    }`}
                     value={formulario.cupones}
                     onChange={(e) => actualizarCampo("cupones", e.target.value)}
                   />
-                  {errores.cupones && <div className="invalid-feedback">{errores.cupones}</div>}
+                  {errores.cupones && (
+                    <div className="invalid-feedback">{errores.cupones}</div>
+                  )}
                 </div>
 
                 <div className="col-md-3">
-                  <label className="form-label fw-semibold" htmlFor="fecha-creacion-promocion">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="fecha-creacion-promocion"
+                  >
                     Fecha de creación
                   </label>
                   <input
                     id="fecha-creacion-promocion"
                     type="date"
-                    className={`form-control ${errores.fecha_creacion ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errores.fecha_creacion ? "is-invalid" : ""
+                    }`}
                     value={formulario.fecha_creacion}
-                    onChange={(e) => actualizarCampo("fecha_creacion", e.target.value)}
+                    onChange={(e) =>
+                      actualizarCampo("fecha_creacion", e.target.value)
+                    }
                   />
-                  {errores.fecha_creacion && <div className="invalid-feedback">{errores.fecha_creacion}</div>}
+                  {errores.fecha_creacion && (
+                    <div className="invalid-feedback">
+                      {errores.fecha_creacion}
+                    </div>
+                  )}
                 </div>
 
                 <div className="col-md-3">
-                  <label className="form-label fw-semibold" htmlFor="estado-promocion">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="estado-promocion"
+                  >
                     Estado
                   </label>
-                  <select id="estado-promocion" className="form-select" value={formulario.estado} onChange={(e) => actualizarCampo("estado", e.target.value)}>
+                  <select
+                    id="estado-promocion"
+                    className="form-select"
+                    value={formulario.estado}
+                    onChange={(e) => actualizarCampo("estado", e.target.value)}
+                  >
                     {ESTADOS_DISPONIBLES.map((estado) => (
                       <option key={estado.value} value={estado.value}>
                         {estado.label}
@@ -266,34 +288,72 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
                 </div>
 
                 <div className="col-md-3">
-                  <label className="form-label fw-semibold" htmlFor="rating-promocion">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="rating-promocion"
+                  >
                     Rating
                   </label>
                   <input
                     id="rating-promocion"
                     type="number"
                     step="0.1"
-                    className={`form-control ${errores.rating ? "is-invalid" : ""}`}
+                    className={`form-control ${
+                      errores.rating ? "is-invalid" : ""
+                    }`}
                     value={formulario.rating}
                     onChange={(e) => actualizarCampo("rating", e.target.value)}
                   />
-                  {errores.rating && <div className="invalid-feedback">{errores.rating}</div>}
+                  {errores.rating && (
+                    <div className="invalid-feedback">{errores.rating}</div>
+                  )}
                 </div>
               </div>
 
               <hr className="my-5 opacity-10" />
 
               <div className="row g-4">
-                <div className="col-md-6">{renderInputArchivo("imagen", "Imagen principal", TIPOS_IMAGEN.join(","), TIPOS_IMAGEN_TEXTO)}</div>
-                <div className="col-md-6">{renderInputArchivo("icono", "Icono de marca", TIPOS_ICONO.join(","), TIPOS_ICONO_TEXTO)}</div>
+                <div className="col-md-6">
+                  <label
+                    className="form-label fw-semibold"
+                    htmlFor="imagen-promocion"
+                  >
+                    Imagen principal
+                  </label>
+                  <input
+                    type="text"
+                    id="imagen-promocion"
+                    placeholder="Ingrese un url"
+                    required
+                    autoComplete="off"
+                    onChange={(e) => actualizarCampo("img", e.target.value)}
+                    value={formulario.img}
+                    className="form-control"
+                  />{" "}
+                </div>
               </div>
 
               <div className="d-flex justify-content-end gap-3 mt-5">
-                <button type="button" className="btn btn-link text-decoration-none text-secondary" onClick={() => navigate(-1)} disabled={enProceso}>
+                <button
+                  type="button"
+                  className="btn btn-link text-decoration-none text-secondary"
+                  onClick={() => navigate(-1)}
+                  disabled={enProceso}
+                >
                   Cancelar y volver
                 </button>
-                <button type="submit" className="btn btn-accent px-5" disabled={enProceso}>
-                  {enProceso ? <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> : null}
+                <button
+                  type="submit"
+                  className="btn btn-accent px-5"
+                  disabled={enProceso}
+                >
+                  {enProceso ? (
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  ) : null}
                   {enProceso ? "Guardando..." : "Publicar promoción"}
                 </button>
               </div>
@@ -301,6 +361,35 @@ const CrearPromocionPagina = ({ enProceso = false, onGuardar }) => {
           </div>
         </div>
       </div>
+      {mostrarModalExito && (
+        <>
+          <div className="modal fade show d-block" role="dialog" aria-modal="true" tabIndex={-1}>
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content bg-panel border-light-subtle shadow-lg">
+                <div className="modal-header border-0 pt-4 pb-0 ps-4 pe-5">
+                  <h5 className="modal-title fw-bold">Éxito</h5>
+                </div>
+                <div className="modal-body ps-4 pe-5">
+                  <p>La promoción ha sido creada exitosamente.</p>
+                </div>
+                <div className="modal-footer border-0 pt-0 pb-4 ps-4 pe-5">
+                  <button
+                    type="button"
+                    className="btn btn-accent"
+                    onClick={() => {
+                      setMostrarModalExito(false);
+                      navigate(-1);
+                    }}
+                  >
+                    Aceptar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show" />
+        </>
+      )}
     </div>
   );
 };

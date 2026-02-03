@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: mysql_db
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_pass # Es mejor definirla siempre
+      - MYSQL_DATABASE=bombcoupons
+      - MYSQL_USER=usuario
+      - MYSQL_PASSWORD=pass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./bombcoupons.sql:/docker-entrypoint-initdb.d/bombcoupons.sql
+    ports:
+      - "3307:3306"
+
+  web:
+    build: .
+    container_name: apache_php
+    ports:
+      - "8080:80"
+    volumes:
+      # Montamos la raíz actual (.) en el contenedor
+      - ./Servidor:/var/www/html
+    environment:
+      - DOCKER_ENV=true
+    depends_on:
+      - db
+
+volumes:
+  db_data:

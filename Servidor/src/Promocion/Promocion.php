@@ -201,8 +201,8 @@ class Promocion
     $v->rule('max', 'rating', 5)
       ->message('Rating no puede exceder 5');
 
-    $v->rule('url', 'img')
-      ->message('Imagen debe ser una URL válida');
+    // $v->rule('url', 'img')
+    //   ->message('Imagen debe ser una URL válida');
 
     if (!$v->validate()) {
       $errores = [];

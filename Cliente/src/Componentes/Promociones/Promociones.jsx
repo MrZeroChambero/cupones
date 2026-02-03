@@ -17,7 +17,6 @@ const normalizarListado = (promociones = []) => {
         estado: item.estado ?? "",
         rating: Number(item.rating) || 0,
         img: item.img ?? item.imagen ?? "",
-        icono: item.icono ?? "",
         fechaCreacion,
       };
     })

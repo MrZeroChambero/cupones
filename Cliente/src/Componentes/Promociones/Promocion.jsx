@@ -21,7 +21,6 @@ const Promocion = ({ promocion }) => {
     estado = "",
     rating = 0,
     img = "",
-    icono = "",
   } = promocion;
 
   const estadoLegible = formatearEstado(estado);
@@ -36,9 +35,9 @@ const Promocion = ({ promocion }) => {
       />
       <div className="reel-promocion-card__cuerpo">
         <div className="d-flex align-items-center gap-3 mb-3">
-          {icono ? (
+          {img ? (
             <img
-              src={icono}
+              src={img}
               alt={`Logo de ${marca}`}
               className="reel-promocion-card__logo"
               width="48"

@@ -51,9 +51,7 @@ const TarjetaVitrinaCupon = ({ cupon, estaRevelado, onRevelar }) => {
   const cuponesRestantes = generarNumeroPseudo(cupon.id, 120, 480);
   const categoria = cupon.categoria || cupon.etiqueta || "General";
   const valoracion = cupon.valoracion || generarValoracion(cupon.id) || "5.0";
-  const descripcion = resumirDescripcion(
-    cupon.descripcion || cupon.copy || "Cupón verificado y listo para usar."
-  );
+  const descripcion = resumirDescripcion(cupon.descripcion || cupon.copy || "Cupón verificado y listo para usar.");
   const descuento = cupon.descuento || "Beneficio exclusivo";
   const expiraTexto = (() => {
     if (diasRestantes === null) {
@@ -76,16 +74,9 @@ const TarjetaVitrinaCupon = ({ cupon, estaRevelado, onRevelar }) => {
 
       <div className="tarjeta-vitrina__marca d-flex align-items-center gap-3 mb-3">
         {cupon.logo ? (
-          <img
-            src={cupon.logo}
-            alt={`Logo de ${cupon.marca}`}
-            className="tarjeta-vitrina__logo"
-            loading="lazy"
-          />
+          <img src={cupon.logo} alt={`Logo de ${cupon.marca}`} className="tarjeta-vitrina__logo" loading="lazy" />
         ) : (
-          <div className="tarjeta-vitrina__logo tarjeta-vitrina__logo--placeholder">
-            {obtenerIniciales(cupon.marca)}
-          </div>
+          <div className="tarjeta-vitrina__logo tarjeta-vitrina__logo--placeholder">{obtenerIniciales(cupon.marca)}</div>
         )}
         <div>
           <p className="text-body-secondary small mb-1">{cupon.marca}</p>
@@ -93,18 +84,14 @@ const TarjetaVitrinaCupon = ({ cupon, estaRevelado, onRevelar }) => {
         </div>
       </div>
 
-      <p className="tarjeta-vitrina__descripcion mb-4 flex-grow-1">
-        {descripcion}
-      </p>
+      <p className="tarjeta-vitrina__descripcion mb-4 flex-grow-1">{descripcion}</p>
 
       <div className="tarjeta-vitrina__estado d-flex flex-column gap-2 mb-3">
         <div className="d-flex justify-content-between">
           <span className="d-inline-flex align-items-center gap-2">
             <FiZap aria-hidden="true" /> {cuponesRestantes} cupones disponibles
           </span>
-          <span className="text-body-secondary small">
-            Código: {cupon.codigo || "No definido"}
-          </span>
+          <span className="text-body-secondary small">Código: {cupon.codigo || "No definido"}</span>
         </div>
         <div className="d-flex justify-content-between align-items-center">
           <span className="d-inline-flex align-items-center gap-2">
@@ -114,11 +101,7 @@ const TarjetaVitrinaCupon = ({ cupon, estaRevelado, onRevelar }) => {
         </div>
       </div>
 
-      <button
-        type="button"
-        className="btn btn-accent w-100 mt-auto"
-        onClick={() => onRevelar?.(cupon.id, cupon)}
-      >
+      <button type="button" className="btn btn-accent w-100 mt-auto" onClick={() => onRevelar?.(cupon.id, cupon)}>
         {estaRevelado ? "Ver detalles" : "Obtener código"}
       </button>
     </article>

@@ -10,12 +10,14 @@ const TarjetaCupon = ({ cupon, estaRevelado, onRevelar, modo = "completo" }) => 
     -modo === "compacto" ? "tarjeta-cupon-compacta" : "tarjeta-cupon-completa",
   ].join(" ");
 
+  console.log(cupon);
+
   return (
     <article className={clasesArticulo}>
       {/* Cabecera con logo y datos básicos */}
       <div className="d-flex align-items-center gap-3">
-        {cupon?.icono ? (
-          <img src={cupon.icono} alt={`Logo de ${cupon.marca}`} className="rounded-4 object-fit-cover" width="80" height="80" />
+        {cupon.img ? (
+          <img src={cupon.img} alt={`Logo de ${cupon.marca}`} className="rounded-4 object-fit-cover" width="80" height="80" />
         ) : (
           <div className="marca-placeholder rounded-4 d-flex align-items-center justify-content-center">{cupon?.marca?.[0] ?? "B"}</div>
         )}

@@ -26,7 +26,7 @@ const PaginaCupon = ({ data }) => {
 
       <div className="custom-modal-container static-view">
         {/* Header con imagen dinámica */}
-        <div className="modal-header-section" style={{ backgroundImage: `url(${cupon.img})` }}>
+        <div className="modal-header-section" style={{ backgroundImage: `url(${cupon.banner})` }}>
           <div className="header-content">
             <img src={cupon.img} alt={cupon.img} className="brand-logo" />
             <div className="brand-info">

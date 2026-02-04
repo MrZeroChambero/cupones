@@ -22,6 +22,7 @@ class Promocion
     'rating' => ['tipo' => 'float', 'default' => 0.0],
     'detalles' => ['tipo' => 'string', 'default' => ''],
     'img' => ['tipo' => 'string', 'default' => ''],
+    'banner' => ['tipo' => 'string', 'default' => ''],
     'coupon_code' => ['tipo' => 'string', 'default' => ''],
     'fecha_creacion' => ['tipo' => 'string', 'default' => ''],
   ];
@@ -40,7 +41,7 @@ class Promocion
   public function listar(): void
   {
     try {
-      $sql = 'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, coupon_code, fecha_creacion
+      $sql = 'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, banner, coupon_code, fecha_creacion
                     FROM promociones
                     ORDER BY fecha_creacion DESC, id_Promocion DESC';
 
@@ -53,37 +54,41 @@ class Promocion
     }
   }
 
-  public function crear(): void
-  {
+ public function crear(): void
+{
     try {
-      $datos = $this->sanitizarDatos($_POST ?? []);
-      $this->validarDatos($datos);
+        $datos = $this->sanitizarDatos($_POST ?? []);
+        $this->validarDatos($datos);
 
-      $sql = 'INSERT INTO promociones (marca, nombre, cupones, estado, rating, detalles, img)
-                    VALUES (:marca, :nombre, :cupones, :estado, :rating, :detalles, :img)';
+        // 1. Agregamos coupon_code al INSERT
+        // 2. Agregamos fecha_creacion (o asegúrate que en BD sea DEFAULT CURRENT_TIMESTAMP)
+        $sql = 'INSERT INTO promociones (marca, nombre, cupones, estado, rating, detalles, img, banner, coupon_code, fecha_creacion)
+                VALUES (:marca, :nombre, :cupones, :estado, :rating, :detalles, :img, :banner, :coupon_code, NOW())';
 
-      $id = $this->conexion->insertar($sql, [
-        ':marca' => $datos['marca'],
-        ':nombre' => $datos['nombre'],
-        ':cupones' => $datos['cupones'],
-        ':estado' => $datos['estado'],
-        ':rating' => $datos['rating'],
-        ':detalles' => $datos['detalles'],
-        ':img' => $datos['img'],
-      ]);
-
+        $id = $this->conexion->insertar($sql, [
+            ':marca' => $datos['marca'],
+            ':nombre' => $datos['nombre'],
+            ':cupones' => $datos['cupones'],
+            ':estado' => $datos['estado'],
+            ':rating' => $datos['rating'],
+            ':detalles' => $datos['detalles'],
+            ':img' => $datos['img'],
+            ':banner' => $datos['banner'],
+            ':coupon_code' => $datos['coupon_code'], // <--- AGREGAR ESTO
+        ]);
       $registro = $this->conexion->consultarUna(
-        'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, coupon_code, fecha_creacion 
+        'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, banner, coupon_code, fecha_creacion 
                  FROM promociones 
                  WHERE id_Promocion = :id',
-        [':id' => $id]
+        [':id' => $id]  
       );
 
-      $promocion = $this->formatearDatos($registro ?: array_merge($datos, [
+      $promocion = $this->formatearDatos($registro ?: [
+        ...$datos,
         'id_Promocion' => $id,
         'coupon_code' => '',
         'fecha_creacion' => date('Y-m-d H:i:s'),
-      ]));
+      ]);
 
       RespuestaJson::exito(['promocion' => $promocion], 'Promoción creada correctamente.', 201);
     } catch (InvalidArgumentException $e) {
@@ -119,13 +124,13 @@ class Promocion
   private function obtenerValorCampo(array $datos, string $campoDestino, $default)
   {
     // Primero buscar por nombre directo
-    if (array_key_exists($campoDestino, $datos)) {
+    if (\array_key_exists($campoDestino, $datos)) {
       return $datos[$campoDestino];
     }
 
     // Buscar en el mapeo de campos de BD
     foreach (self::MAPEO_CAMPOS as $campoBD => $campoFormateado) {
-      if ($campoFormateado === $campoDestino && array_key_exists($campoBD, $datos)) {
+      if ($campoFormateado === $campoDestino && \array_key_exists($campoBD, $datos)) {
         return $datos[$campoBD];
       }
     }
@@ -138,37 +143,35 @@ class Promocion
    */
   private function aplicarTipo($valor, string $tipo)
   {
-    switch ($tipo) {
-      case 'int':
-        return (int) $valor;
-      case 'float':
-        return round((float) $valor, 1);
-      case 'string':
-        return (string) $valor;
-      default:
-        return $valor;
-    }
+    return match ($tipo) {
+      'int' => (int) $valor,
+      'float' => round((float) $valor, 1),
+      'string' => (string) $valor,
+      default => $valor,
+    };
   }
 
-  private function sanitizarDatos(array $input): array
-  {
+ private function sanitizarDatos(array $input): array
+{
     return [
-      'marca' => trim((string)($input['marca'] ?? '')),
-      'nombre' => trim((string)($input['nombre'] ?? '')),
-      'detalles' => trim((string)($input['detalles'] ?? '')),
-      'cupones' => (string)($input['cupones'] ?? ''),
-      'estado' => trim((string)($input['estado'] ?? 'disponible')),
-      'rating' => (string)($input['rating'] ?? ''),
-      'img' => trim((string)($input['img'] ?? '')),
+        'marca' => trim((string)($input['marca'] ?? '')),
+        'nombre' => trim((string)($input['nombre'] ?? '')),
+        'detalles' => trim((string)($input['detalles'] ?? '')),
+        'cupones' => (string)($input['cupones'] ?? ''),
+        'estado' => trim((string)($input['estado'] ?? 'disponible')),
+        'rating' => (string)($input['rating'] ?? ''),
+        'img' => trim((string)($input['img'] ?? '')),
+        'banner' => trim((string)($input['banner'] ?? '')),
+        'coupon_code' => trim((string)($input['coupon_code'] ?? '')), // <--- AGREGAR ESTO
     ];
-  }
+}
 
   private function validarDatos(array &$datos): void
   {
     $v = new Validator($datos);
 
     // Reglas de validación con Valitron
-    $v->rule('required', ['marca', 'nombre', 'detalles', 'img'])
+    $v->rule('required', ['marca', 'nombre', 'detalles', 'img', 'banner'])
       ->message('{field} es obligatorio');
 
     $v->rule('lengthMax', 'marca', 120)

@@ -39,7 +39,7 @@ const ModalCodigoCupon = ({ cupon, visible, onCerrar }) => {
     <div className="custom-modal-overlay" onClick={fase === "inicio" ? onCerrar : null}>
       <div className="custom-modal-container" onClick={(e) => e.stopPropagation()}>
         {/* Header - Se mantiene siempre según tu petición */}
-        <div className="modal-header-section" style={{ backgroundImage: `url(${cupon.img})` }}>
+        <div className="modal-header-section" style={{ backgroundImage: `url(${cupon.banner})` }}>
           {/* El botón cerrar solo se muestra en la fase inicial */}
           {fase === "inicio" && (
             <button className="close-btn" onClick={onCerrar}>

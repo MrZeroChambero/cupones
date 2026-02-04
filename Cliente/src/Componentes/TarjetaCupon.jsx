@@ -7,10 +7,8 @@ const TarjetaCupon = ({ cupon, estaRevelado, onRevelar, modo = "completo" }) => 
 
   const clasesArticulo = [
     "tarjeta-cupon bg-panel border border-light-subtle rounded-4 p-4 mb-3 shadow-sm position-relative overflow-hidden d-flex justify-content-between align-items-center",
-    -modo === "compacto" ? "tarjeta-cupon-compacta" : "tarjeta-cupon-completa",
+    modo === "compacto" ? "tarjeta-cupon-compacta" : "tarjeta-cupon-completa",
   ].join(" ");
-
-  console.log(cupon);
 
   return (
     <article className={clasesArticulo}>

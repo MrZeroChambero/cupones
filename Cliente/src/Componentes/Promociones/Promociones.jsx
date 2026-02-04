@@ -17,6 +17,7 @@ const normalizarListado = (promociones = []) => {
         estado: item.estado ?? "",
         rating: Number(item.rating) || 0,
         img: item.img ?? item.imagen ?? "",
+        banner: item.banner ?? item.imagen_banner ?? "",
         fechaCreacion,
       };
     })
@@ -34,8 +35,6 @@ const Promociones = ({ promociones = [], onCrearPromocion }) => {
   if (!items.length) {
     return null;
   }
-
-  console.log(items);
 
   return (
     <section className="reels-promociones rounded-5 p-4 mb-4">

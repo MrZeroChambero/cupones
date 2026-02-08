@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copiamos solo los archivos de dependencias primero para aprovechar el cache
+COPY package*.json ./
+
+# Instalamos dependencias limpias (ignora lo que tengas en local)
+RUN npm install
+
+# Copiamos el resto del código
+COPY . .
+
+EXPOSE 5173
+
+# Usamos la sintaxis correcta de JSON array
+CMD ["npm", "run", "init", "--", "--host", "0.0.0.0", "--no-open"]

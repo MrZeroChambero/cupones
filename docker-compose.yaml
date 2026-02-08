@@ -1,11 +1,10 @@
-version: "3.8"
-
 services:
+  # Base de Datos MySQL
   db:
     image: mysql:8.4
     container_name: mysql_db
     environment:
-      - MYSQL_ROOT_PASSWORD=root_pass # Es mejor definirla siempre
+      - MYSQL_ROOT_PASSWORD=root_pass
       - MYSQL_DATABASE=bombcoupons
       - MYSQL_USER=usuario
       - MYSQL_PASSWORD=pass
@@ -15,18 +14,34 @@ services:
     ports:
       - "3307:3306"
 
+  # Backend PHP / Apache
   web:
-    build: .
+    build:
+      context: ./Servidor
     container_name: apache_php
     ports:
-      - "8080:80"
+      - "8081:80"
     volumes:
-      # Montamos la raíz actual (.) en el contenedor
       - ./Servidor:/var/www/html
     environment:
       - DOCKER_ENV=true
     depends_on:
       - db
+
+  # Frontend React (Vite)
+  frontend:
+    build:
+      context: ./Cliente
+    container_name: react_client
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./Cliente:/app
+      - /app/node_modules # Evita que Windows pise las dependencias de Linux
+    # CAMBIO: Usamos 'run dev' y forzamos el host para que sea accesible
+    command: npm run dev -- --host 0.0.0.0
+    depends_on:
+      - web
 
 volumes:
   db_data:

@@ -41,9 +41,14 @@ class Promocion
   public function listar(): void
   {
     try {
-      $sql = 'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, banner, coupon_code, fecha_creacion
-                    FROM promociones
-                    ORDER BY fecha_creacion DESC, id_Promocion DESC';
+      $columnasBD = $this->obtenerColumnasTabla('promociones');
+      $deseadas = ['id_Promocion', 'marca', 'nombre', 'cupones', 'estado', 'rating', 'detalles', 'img', 'banner', 'coupon_code', 'fecha_creacion'];
+      $seleccion = array_values(array_intersect($deseadas, $columnasBD));
+      if (empty($seleccion)) {
+        throw new \RuntimeException('No hay columnas disponibles para seleccionar en promociones.');
+      }
+
+      $sql = 'SELECT ' . implode(', ', $seleccion) . ' FROM promociones ORDER BY fecha_creacion DESC, id_Promocion DESC';
 
       $registros = $this->conexion->consultar($sql);
       $promociones = array_map([$this, 'formatearDatos'], $registros);
@@ -54,34 +59,40 @@ class Promocion
     }
   }
 
- public function crear(): void
-{
+  public function crear(): void
+  {
     try {
-        $datos = $this->sanitizarDatos($_POST ?? []);
-        $this->validarDatos($datos);
+      $datos = $this->sanitizarDatos($_POST ?? []);
+      $this->validarDatos($datos);
+      // Construir INSERT dinámico según columnas disponibles
+      $columnasBD = $this->obtenerColumnasTabla('promociones');
+      $posibles = ['marca', 'nombre', 'cupones', 'estado', 'rating', 'detalles', 'img', 'banner', 'coupon_code', 'fecha_creacion'];
+      $campos = array_values(array_intersect($posibles, $columnasBD));
 
-        // 1. Agregamos coupon_code al INSERT
-        // 2. Agregamos fecha_creacion (o asegúrate que en BD sea DEFAULT CURRENT_TIMESTAMP)
-        $sql = 'INSERT INTO promociones (marca, nombre, cupones, estado, rating, detalles, img, banner, coupon_code, fecha_creacion)
-                VALUES (:marca, :nombre, :cupones, :estado, :rating, :detalles, :img, :banner, :coupon_code, NOW())';
+      if (empty($campos)) {
+        throw new \RuntimeException('No hay columnas disponibles para insertar en promociones.');
+      }
 
-        $id = $this->conexion->insertar($sql, [
-            ':marca' => $datos['marca'],
-            ':nombre' => $datos['nombre'],
-            ':cupones' => $datos['cupones'],
-            ':estado' => $datos['estado'],
-            ':rating' => $datos['rating'],
-            ':detalles' => $datos['detalles'],
-            ':img' => $datos['img'],
-            ':banner' => $datos['banner'],
-            ':coupon_code' => $datos['coupon_code'], // <--- AGREGAR ESTO
-        ]);
-      $registro = $this->conexion->consultarUna(
-        'SELECT id_Promocion, marca, nombre, cupones, estado, rating, detalles, img, banner, coupon_code, fecha_creacion 
-                 FROM promociones 
-                 WHERE id_Promocion = :id',
-        [':id' => $id]  
-      );
+      $insertCols = [];
+      $placeholders = [];
+      $params = [];
+      foreach ($campos as $col) {
+        if ($col === 'fecha_creacion') {
+          $insertCols[] = $col;
+          $placeholders[] = 'NOW()';
+          continue;
+        }
+        $insertCols[] = $col;
+        $placeholders[] = ':' . $col;
+        $params[':' . $col] = $datos[$col] ?? '';
+      }
+
+      $sql = 'INSERT INTO promociones (' . implode(', ', $insertCols) . ') VALUES (' . implode(', ', $placeholders) . ')';
+      $id = $this->conexion->insertar($sql, $params);
+      $columnasBD = $this->obtenerColumnasTabla('promociones');
+      $seleccion = array_values(array_intersect(['id_Promocion', 'marca', 'nombre', 'cupones', 'estado', 'rating', 'detalles', 'img', 'banner', 'coupon_code', 'fecha_creacion'], $columnasBD));
+      $sqlSelect = 'SELECT ' . implode(', ', $seleccion) . ' FROM promociones WHERE id_Promocion = :id';
+      $registro = $this->conexion->consultarUna($sqlSelect, [':id' => $id]);
 
       $promocion = $this->formatearDatos($registro ?: [
         ...$datos,
@@ -151,20 +162,46 @@ class Promocion
     };
   }
 
- private function sanitizarDatos(array $input): array
-{
+  /**
+   * Devuelve las columnas existentes de una tabla (names of fields)
+   * @param string $tabla
+   * @return array
+   */
+  private function obtenerColumnasTabla(string $tabla): array
+  {
+    try {
+      $filas = $this->conexion->consultar("SHOW COLUMNS FROM {$tabla}");
+      if (!is_array($filas)) {
+        return [];
+      }
+      $cols = [];
+      foreach ($filas as $f) {
+        if (is_array($f) && isset($f['Field'])) {
+          $cols[] = $f['Field'];
+        } elseif (is_object($f) && isset($f->Field)) {
+          $cols[] = $f->Field;
+        }
+      }
+      return $cols;
+    } catch (Throwable $e) {
+      return [];
+    }
+  }
+
+  private function sanitizarDatos(array $input): array
+  {
     return [
-        'marca' => trim((string)($input['marca'] ?? '')),
-        'nombre' => trim((string)($input['nombre'] ?? '')),
-        'detalles' => trim((string)($input['detalles'] ?? '')),
-        'cupones' => (string)($input['cupones'] ?? ''),
-        'estado' => trim((string)($input['estado'] ?? 'disponible')),
-        'rating' => (string)($input['rating'] ?? ''),
-        'img' => trim((string)($input['img'] ?? '')),
-        'banner' => trim((string)($input['banner'] ?? '')),
-        'coupon_code' => trim((string)($input['coupon_code'] ?? '')), // <--- AGREGAR ESTO
+      'marca' => trim((string)($input['marca'] ?? '')),
+      'nombre' => trim((string)($input['nombre'] ?? '')),
+      'detalles' => trim((string)($input['detalles'] ?? '')),
+      'cupones' => (string)($input['cupones'] ?? ''),
+      'estado' => trim((string)($input['estado'] ?? 'disponible')),
+      'rating' => (string)($input['rating'] ?? ''),
+      'img' => trim((string)($input['img'] ?? '')),
+      'banner' => trim((string)($input['banner'] ?? '')),
+      'coupon_code' => trim((string)($input['coupon_code'] ?? '')), // <--- AGREGAR ESTO
     ];
-}
+  }
 
   private function validarDatos(array &$datos): void
   {

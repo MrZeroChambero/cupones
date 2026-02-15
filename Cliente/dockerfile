@@ -14,4 +14,4 @@ COPY . .
 EXPOSE 5173
 
 # Usamos la sintaxis correcta de JSON array
-CMD ["npm", "run", "init", "--", "--host", "0.0.0.0", "--no-open"]
+CMD ["npm", "run", "init"]

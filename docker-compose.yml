@@ -1,8 +1,8 @@
 services:
-  # Base de Datos MySQL
   db:
     image: mysql:8.4
     container_name: mysql_db
+    command: --innodb_buffer_pool_size=128M --performance_schema=OFF
     environment:
       - MYSQL_ROOT_PASSWORD=root_pass
       - MYSQL_DATABASE=bombcoupons
@@ -13,8 +13,11 @@ services:
       - ./bombcoupons.sql:/docker-entrypoint-initdb.d/bombcoupons.sql
     ports:
       - "3307:3306"
+    deploy:
+      resources:
+        limits:
+          memory: 512M 
 
-  # Backend PHP / Apache
   web:
     build:
       context: ./Servidor
@@ -27,8 +30,11 @@ services:
       - DOCKER_ENV=true
     depends_on:
       - db
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
-  # Frontend React (Vite)
   frontend:
     build:
       context: ./Cliente
@@ -37,10 +43,14 @@ services:
       - "5173:5173"
     volumes:
       - ./Cliente:/app
-      - /app/node_modules 
+      - /app/node_modules
     command: npm run dev -- --host 0.0.0.0
     depends_on:
       - web
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
 volumes:
   db_data:

@@ -124,7 +124,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 }
 
 $router = new AltoRouter();
-if ($_ENV['DOCKER'] === true) {
+if ($_ENV['DOCKER'] === true || $_ENV['DOCKER'] === 'true') {
   $router->setBasePath('');
 } else {
   $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/');

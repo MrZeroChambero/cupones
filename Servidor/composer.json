@@ -14,5 +14,11 @@
   "require": {
     "altorouter/altorouter": "^2.0",
     "vlucas/valitron": "^1.4"
+  },
+  "config": {
+    "platform": {
+      "php": "MAJOR.MINOR.PATCH",
+      "ext-something": "MAJOR.MINOR.PATCH"
+    }
   }
 }
